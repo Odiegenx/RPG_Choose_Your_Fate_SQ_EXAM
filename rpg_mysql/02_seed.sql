@@ -1,0 +1,150 @@
+-- Removes foreign key restraints for easier seeding --
+SET FOREIGN_KEY_CHECKS=0;
+USE choose_your_fate;
+
+-- Race Details
+INSERT INTO race_details (id) VALUES (1), (2), (3);
+
+-- Accounts
+INSERT INTO account (username, password, salt, email, character_limit) VALUES
+('dragonslayer', 'hashed_password_1', 'salt1', 'dragon@rpg.com', 3),
+('shadowmage', 'hashed_password_2', 'salt2', 'shadow@rpg.com', 3),
+('ironclad', 'hashed_password_3', 'salt3', 'iron@rpg.com', 3);
+
+-- Items
+INSERT INTO item (name, description, type) VALUES
+('Iron Sword', 'A basic iron sword', 'weapon'),
+('Leather Helmet', 'Basic head protection', 'armor'),
+('Leather Leggings', 'Basic leg protection', 'armor'),
+('Chainmail Chest', 'Medium chest protection', 'armor'),
+('Health Potion', 'Restores 50 HP', 'consumable'),
+('Magic Staff', 'A staff imbued with magic', 'weapon'),
+('Shadow Cloak', 'A cloak that blends with shadows', 'armor'),
+('Ancient Tome', 'Contains forbidden knowledge', 'quest_item'),
+('Golden Key', 'Opens the ancient vault', 'quest_item'),
+('Poisoned Dagger', 'A dagger with poison coating', 'weapon');
+
+-- Chapters
+INSERT INTO chapter (name) VALUES
+('Chapter 1 - The Beginning'),
+('Chapter 2 - The Dark Forest'),
+('Chapter 3 - The Ancient Vault');
+
+-- Scenes
+INSERT INTO scene (chapter_id, name) VALUES
+(1, 'The Tavern'),           -- 1
+(1, 'The Town Square'),      -- 2
+(1, 'The Town Gate'),        -- 3
+(2, 'Forest Entrance'),      -- 4
+(2, 'Deep Forest'),          -- 5
+(2, 'The Witches Hut'),      -- 6
+(3, 'Vault Entrance'),       -- 7
+(3, 'The Vault'),            -- 8
+(3, 'The Inner Sanctum');    -- 9
+
+-- NPCs
+INSERT INTO npc (name, race_details_id) VALUES
+('Old Tom the Bartender', 1),
+('Captain Aldric', 2),
+('The Mysterious Witch', 3),
+('Vault Guardian', 1),
+('Merchant Gregor', 2);
+
+-- Scene has NPC
+INSERT INTO scene_has_npc (scene_id, npc_id) VALUES
+(1, 1),  -- tavern has bartender
+(1, 5),  -- tavern has merchant
+(2, 2),  -- town square has captain
+(6, 3),  -- witches hut has witch
+(7, 4);  -- vault entrance has guardian
+
+-- Quests
+INSERT INTO quest (scene_id, description) VALUES
+(1, 'Old Tom asks you to retrieve his stolen ale from the bandits in the forest.'),
+(2, 'Captain Aldric needs you to scout the dark forest and report back.'),
+(6, 'The witch demands you bring her the ancient tome from the vault.'),
+(7, 'The guardian will let you pass if you solve his riddle.');
+
+-- Quest has Item
+INSERT INTO quest_has_item (quest_id, item_id) VALUES
+(1, 5),   -- stolen ale quest rewards health potion
+(3, 8),   -- witch quest requires ancient tome
+(4, 9);   -- guardian quest requires golden key
+
+-- Choices
+INSERT INTO choice (scene_id, destination_scene_id, description, consequence, target_id, value_int, story_weight, requirements) VALUES
+(1, 2, 'Head to the town square', 'You leave the tavern', NULL, NULL, 1, NULL),
+(1, 4, 'Go directly to the forest', 'You head straight for the forest, skipping town', NULL, NULL, 2, NULL),
+(2, 3, 'Head to the town gate', 'You walk towards the gate', NULL, NULL, 1, NULL),
+(2, 1, 'Go back to the tavern', 'You return to the tavern', NULL, NULL, 1, NULL),
+(3, 4, 'Enter the dark forest', 'You step into the darkness', NULL, -10, 3, NULL),
+(4, 5, 'Go deeper into the forest', 'You venture further in', NULL, NULL, 2, NULL),
+(4, 6, 'Follow the strange light', 'You follow a flickering light to a hut', NULL, NULL, 2, NULL),
+(5, 6, 'Head towards the hut you spotted', 'You make your way to the hut', NULL, NULL, 1, NULL),
+(5, 7, 'Find the vault entrance', 'You discover a hidden entrance', NULL, NULL, 3, NULL),
+(6, 7, 'Ask the witch about the vault', 'The witch gives you directions', NULL, NULL, 2, NULL),
+(7, 8, 'Attempt to solve the riddle', 'You ponder the riddle carefully', NULL, NULL, 3, NULL),
+(7, 8, 'Bribe the guardian', 'You offer gold to pass', NULL, -20, 2, NULL),
+(8, 9, 'Enter the inner sanctum', 'You push open the heavy doors', NULL, NULL, 3, NULL),
+(8, 1, 'Take the treasure and flee', 'You grab what you can and run', NULL, 50, 3, NULL);
+
+-- Choice has Item
+INSERT INTO choice_has_item (choice_id, item_id) VALUES
+(12, 9),  -- bribing guardian uses golden key
+(14, 8);  -- taking treasure gives ancient tome
+
+-- Character Avatars
+INSERT INTO character_avatar (account_id, chapter_id, scene_id, race_detail_id, name, flag) VALUES
+(1, 1, 2, 1, 'Thorin', '{}'),
+(2, 2, 5, 2, 'Lyra', '{}'),
+(3, 1, 1, 3, 'Magnus', '{}');
+
+-- Character Details
+INSERT INTO character_details (character_id, intelligence, charisma, fashion) VALUES
+(1, 8, 5, 3),
+(2, 12, 7, 6),
+(3, 6, 9, 8);
+
+-- Equipment
+INSERT INTO equipment (character_id, head, legs, chest) VALUES
+(1, 2, 3, 4),    -- Thorin has leather helmet, leggings, chainmail
+(2, NULL, NULL, NULL),  -- Lyra has no equipment
+(3, NULL, 3, NULL);     -- Magnus has only leggings
+
+-- Inventory
+INSERT INTO inventory (character_id) VALUES (1), (2), (3);
+
+-- Inventory has Item
+INSERT INTO inventory_has_item (inventory_id, item_id, amount) VALUES
+(1, 1, 1),   -- Thorin has 1 iron sword
+(1, 5, 3),   -- Thorin has 3 health potions
+(2, 6, 1),   -- Lyra has 1 magic staff
+(2, 5, 2),   -- Lyra has 2 health potions
+(2, 8, 1),   -- Lyra has ancient tome
+(3, 10, 1),  -- Magnus has poisoned dagger
+(3, 7, 1);   -- Magnus has shadow cloak
+
+-- Character Path
+INSERT INTO character_path (character_id, summary) VALUES
+(1, 'Thorin started his journey in the tavern and made his way to the town square.'),
+(2, 'Lyra ventured deep into the dark forest following strange lights.'),
+(3, NULL);
+
+-- Character Path Choice
+INSERT INTO character_path_choice (character_path_id, choice_id) VALUES
+(1, 1),   -- Thorin headed to town square
+(1, 3),   -- Thorin headed to town gate
+(2, 2),   -- Lyra went directly to forest
+(2, 6),   -- Lyra went deeper into forest
+(2, 7);   -- Lyra followed the strange light
+
+-- Character has Quest
+INSERT INTO character_has_quest (character_id, quest_id, status) VALUES
+(1, 1, 0),   -- Thorin has ale quest, not complete
+(1, 2, 0),   -- Thorin has scout quest, not complete
+(2, 2, 1),   -- Lyra completed scout quest
+(2, 3, 0),   -- Lyra has witch quest, not complete
+(3, 1, 0);   -- Magnus has ale quest, not complete
+
+-- Sets foreign key restraints to normal -- 
+SET FOREIGN_KEY_CHECKS=1;

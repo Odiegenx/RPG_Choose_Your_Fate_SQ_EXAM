@@ -1,7 +1,11 @@
 package dk.ek.gruppe2.chooseyourfate.model.mysql;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
+@Builder
+@AllArgsConstructor
 @Entity
 @Table(name = "character_path")
 public class CharacterPath {
