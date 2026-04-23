@@ -19,6 +19,9 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (account.getRole() == null) {
+            throw new IllegalStateException("Account role is null for user: " + account.getUsername());
+        }
         return List.of(new SimpleGrantedAuthority(account.getRole().name()));
     }
 
