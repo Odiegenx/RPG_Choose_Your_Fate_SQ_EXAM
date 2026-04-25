@@ -13,6 +13,28 @@ services:
       - rpg_mysql:/var/rpg_mysql
       - ./rpg_mysql:/docker-entrypoint-initdb.d
     hostname: rpg_mysql
+
+  rpg_mongodb:
+    image: mongo:7.0
+    container_name: rpg_mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: "123456"
+      MONGO_INITDB_DATABASE: rpg_db
+    volumes:
+      - rpg_mongodb:/data/db
+      - ./rpg_mongodb:/docker-entrypoint-initdb.d
+    hostname: rpg_mongodb
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   rpg_mysql:
+    driver: local
+  rpg_mongodb:
     driver: local

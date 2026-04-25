@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CharacterPathRepository extends JpaRepository<CharacterPath, Integer> {
-    List<CharacterPath> findByCharacter_Id(Integer characterId);
+    CharacterPath findByCharacter_Id(Integer characterId);
 }
