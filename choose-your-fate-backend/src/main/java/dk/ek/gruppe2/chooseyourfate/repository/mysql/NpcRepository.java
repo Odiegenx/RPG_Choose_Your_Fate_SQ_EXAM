@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface NpcRepository extends JpaRepository<Npc, Integer> {
     List<Npc> findByRaceDetails_Id(Integer raceDetailsId);
+
+    boolean existsByRaceDetails_Id(Integer raceDetailsId);
 }

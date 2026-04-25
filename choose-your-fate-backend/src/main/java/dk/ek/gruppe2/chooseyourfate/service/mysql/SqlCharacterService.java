@@ -98,6 +98,7 @@ public class SqlCharacterService implements CharacterDataAccess {
                 .orElseThrow(() -> new ResourceNotFoundException("Character not found with id: " + id));
     }
 
+    // SQL enforces FK constraints, so references must be validated before insert. Other data sources (Neo4j, MongoDB) have no such restrictions and handle this themselves.
     private void validateCreateRequest(CreateCharacterRequestDTO request) {
         if (!accountRepository.existsById(request.getAccountId())) {
             throw new ResourceNotFoundException("Account not found with id: " + request.getAccountId());
