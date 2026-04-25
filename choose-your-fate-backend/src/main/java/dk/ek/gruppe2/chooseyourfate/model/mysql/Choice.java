@@ -22,7 +22,7 @@ public class Choice {
     private String description;
 
     @Column(length = 50)
-    private String consequence;
+    private String consequence; //TODO: should this not be an enum?
 
     @Column(name = "target_id")
     private Integer targetId;
