@@ -1,9 +1,12 @@
 package dk.ek.gruppe2.chooseyourfate.repository.mongodb;
 
-import dk.ek.gruppe2.chooseyourfate.model.mongodb.ChoiceMongo;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
+/**
+ * {@code ChoiceMongo} is modeled as an embedded document within
+ * {@code SceneDocumentMongo}, so it should not be exposed as a dedicated
+ * Spring Data repository backed by its own MongoDB collection.
+ */
+public final class ChoiceRepositoryMongo {
 
-@Repository
-public interface ChoiceRepositoryMongo extends MongoRepository<ChoiceMongo, String> {
+    private ChoiceRepositoryMongo() {
+    }
 }
