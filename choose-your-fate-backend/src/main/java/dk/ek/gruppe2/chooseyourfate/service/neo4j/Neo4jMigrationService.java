@@ -202,14 +202,14 @@ public class Neo4jMigrationService {
             run(
                     "MERGE (a:Account {id: $id}) " +
                             "SET a.username = $username, a.password = $password, a.characterLimit = $characterLimit, " +
-                            "a.email = $email, a.salt = $salt",
+                            "a.email = $email, a.role = $role",
                     params(
                             "id", account.getId(),
                             "username", account.getUsername(),
                             "password", account.getPassword(),
                             "characterLimit", account.getCharacterLimit(),
                             "email", account.getEmail(),
-                            "salt", account.getSalt()
+                            "role", account.getRole() == null ? null : account.getRole().name()
                     )
             );
         }

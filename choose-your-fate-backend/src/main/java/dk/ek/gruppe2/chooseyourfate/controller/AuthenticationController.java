@@ -2,11 +2,12 @@ package dk.ek.gruppe2.chooseyourfate.controller;
 
 import org.springframework.web.bind.annotation.*;
 
+import dk.ek.gruppe2.chooseyourfate.dto.AccountResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.AuthTokenResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateAccountRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.LoginDTO;
-import dk.ek.gruppe2.chooseyourfate.repository.mysql.AccountRepository;
 import dk.ek.gruppe2.chooseyourfate.security.JwtUtil;
-import dk.ek.gruppe2.chooseyourfate.service.mysql.AccountService;
+import dk.ek.gruppe2.chooseyourfate.service.AccountService;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,23 +32,21 @@ public class AuthenticationController {
     }
     
     @PostMapping("/register")
-    public String register(@RequestBody CreateAccountRequestDTO acc) {
-        accountService.createAccount(acc);
-
-        return "Registered";
+    public AccountResponseDTO register(@RequestBody CreateAccountRequestDTO acc) {
+        return accountService.registerAccount(acc);
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginDTO request) {
+    public AuthTokenResponseDTO login(@RequestBody LoginDTO request) {
 
         Authentication auth = authManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                request.username,
-                request.password
+                request.getUsername(),
+                request.getPassword()
             )
         );
 
         UserDetails user = (UserDetails) auth.getPrincipal();
-        return jwtUtil.generateToken(user);
+        return new AuthTokenResponseDTO(jwtUtil.generateToken(user));
     }
 }
