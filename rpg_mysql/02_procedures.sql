@@ -5,12 +5,16 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS `sp_create_character`$$
 CREATE DEFINER=`root`@`%` PROCEDURE `sp_create_character`(
 IN p_account_id INT,
+IN p_chapter_id INT,
+IN p_scene_id INT,
 IN p_race_detail_id INT,
-IN p_name varchar(50)
+IN p_name varchar(50),
+OUT p_character_id INT
 )
 BEGIN
 DECLARE v_character_count INT;
 DECLARE v_character_limit INT;
+DECLARE v_scene_chapter_id INT;
 
 SELECT character_limit INTO v_character_limit
 FROM account WHERE id = p_account_id;
@@ -18,9 +22,24 @@ FROM account WHERE id = p_account_id;
 SELECT COUNT(character_id) INTO v_character_count
 FROM `character_avatar` WHERE account_id = p_account_id;
 
+SELECT chapter_id INTO v_scene_chapter_id
+FROM scene
+WHERE id = p_scene_id;
+
+IF v_scene_chapter_id IS NULL THEN
+	SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Selected scene does not exist.';
+END IF;
+
+IF v_scene_chapter_id != p_chapter_id THEN
+	SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Selected scene does not belong to the selected chapter.';
+END IF;
+
 IF v_character_count < v_character_limit THEN
-	INSERT INTO `character_avatar` (account_id, chapter_id, scene_id, race_detail_id, name)
-    VALUES (p_account_id, 1, 1, p_race_detail_id, p_name);
+	INSERT INTO `character_avatar` (account_id, chapter_id, scene_id, race_detail_id, name, flag)
+    VALUES (p_account_id, p_chapter_id, p_scene_id, p_race_detail_id, p_name, JSON_OBJECT());
+    SET p_character_id = LAST_INSERT_ID();
 ELSE
 	SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Character limit reached.';

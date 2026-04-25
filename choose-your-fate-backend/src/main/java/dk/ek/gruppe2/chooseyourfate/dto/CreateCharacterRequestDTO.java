@@ -3,6 +3,8 @@ package dk.ek.gruppe2.chooseyourfate.dto;
 public class CreateCharacterRequestDTO {
 
     private Integer accountId;
+    private Integer chapterId;
+    private Integer sceneId;
     private Integer raceDetailsId;
     private String name;
 
@@ -23,6 +25,22 @@ public class CreateCharacterRequestDTO {
 
     public void setRaceDetailsId(Integer raceDetailsId) {
         this.raceDetailsId = raceDetailsId;
+    }
+
+    public Integer getChapterId() {
+        return chapterId;
+    }
+
+    public void setChapterId(Integer chapterId) {
+        this.chapterId = chapterId;
+    }
+
+    public Integer getSceneId() {
+        return sceneId;
+    }
+
+    public void setSceneId(Integer sceneId) {
+        this.sceneId = sceneId;
     }
 
     public String getName() {
