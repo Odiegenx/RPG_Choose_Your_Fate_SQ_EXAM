@@ -31,7 +31,6 @@ public class AccountMigrationServiceMongo {
             AccountDocumentMongo doc = AccountDocumentMongo.builder()
                     .username(entity.getUsername())
                     .password(entity.getPassword())
-                    .salt(entity.getSalt())
                     .email(entity.getEmail())
                     .characterLimit(entity.getCharacterLimit())
                     .build();

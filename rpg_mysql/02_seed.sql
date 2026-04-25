@@ -6,10 +6,10 @@ USE choose_your_fate;
 INSERT INTO race_details (id) VALUES (1), (2), (3);
 
 -- Accounts
-INSERT INTO account (username, password, salt, email, character_limit) VALUES
-('dragonslayer', 'hashed_password_1', 'salt1', 'dragon@rpg.com', 3),
-('shadowmage', 'hashed_password_2', 'salt2', 'shadow@rpg.com', 3),
-('ironclad', 'hashed_password_3', 'salt3', 'iron@rpg.com', 3);
+INSERT INTO account (username, password, email, character_limit, role) VALUES
+('dragonslayer', 'hashed_password_1', 'dragon@rpg.com', 3, 'ROLE_USER'),
+('shadowmage', 'hashed_password_2', 'shadow@rpg.com', 3, 'ROLE_USER'),
+('ironclad', 'hashed_password_3', 'iron@rpg.com', 3, 'ROLE_USER');
 
 -- Items
 INSERT INTO item (name, description, type) VALUES
