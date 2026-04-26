@@ -1,13 +1,15 @@
 package dk.ek.gruppe2.chooseyourfate.controller;
 
+import dk.ek.gruppe2.chooseyourfate.dto.ItemRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.ItemResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.service.mysql.ItemService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/choose-your-fate/items")
 public class ItemController {
 
     ItemService itemService;
@@ -17,8 +19,28 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemResponseDTO> getItems() {
-        return itemService.getItems();
+    public List<ItemResponseDTO> getAllItems() {
+        return itemService.getAllItems();
     }
 
+    @GetMapping("/{id}")
+    public ItemResponseDTO getItemById(@PathVariable("id") Integer id) {
+        return itemService.getItemById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<Boolean> createItem(@RequestBody ItemRequestDTO requestDTO) {
+        return itemService.CreateItem(requestDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ItemResponseDTO updateItem(@PathVariable("id") Integer id, @RequestBody ItemRequestDTO requestDTO) {
+        return itemService.updateItem(id, requestDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteItem(@PathVariable("id") Integer id) {
+        itemService.DeleteItem(id);
+    }
 }
+
