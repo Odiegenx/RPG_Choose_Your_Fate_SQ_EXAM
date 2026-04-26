@@ -21,7 +21,7 @@ import dk.ek.gruppe2.chooseyourfate.service.ChoiceService;
 
 
 @RestController
-@RequestMapping("/choose-your-fate/Choice")
+@RequestMapping("/choose-your-fate/choices")
 public class ChoiceController {
     private static final String DATA_SOURCE_HEADER = "X-Data-Source";
 
