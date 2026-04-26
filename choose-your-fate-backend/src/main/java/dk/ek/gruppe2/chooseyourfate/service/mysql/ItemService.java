@@ -15,7 +15,6 @@ import java.util.List;
 public class ItemService {
 
     ItemRepository itemRepository;
-    ItemResponseDTO itemResponseDTO;
 
     public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
