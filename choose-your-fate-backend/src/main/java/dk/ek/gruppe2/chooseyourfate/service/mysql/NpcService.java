@@ -55,6 +55,9 @@ public class NpcService {
     }
 
     public void deleteNpc(Integer id) {
+        if (!npcRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         npcRepository.deleteById(id);
     }
 }
