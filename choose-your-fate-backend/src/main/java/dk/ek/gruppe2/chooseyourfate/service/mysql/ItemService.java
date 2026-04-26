@@ -48,6 +48,9 @@ public class ItemService {
     }
 
     public void DeleteItem(Integer itemId) {
+        if (!itemRepository.existsById(itemId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         itemRepository.deleteById(itemId);
     }
 }
