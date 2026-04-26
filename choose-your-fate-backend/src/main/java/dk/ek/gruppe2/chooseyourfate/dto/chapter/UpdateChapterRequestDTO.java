@@ -10,14 +10,6 @@ public class UpdateChapterRequestDTO {
     private String name;
     private List<Scene> scenes;
     private List<CharacterAvatar> characters;
-import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterAvatar;
-import dk.ek.gruppe2.chooseyourfate.model.mysql.Scene;
-
-public class UpdateChapterRequestDTO {
-    
-    private String name;
-    private List<Scene> scenes;
-    private List<CharacterAvatar> characters;
     //TODO: Change scenes and characters to sceneIds and characterIds
     public String getName() {
         return name;
