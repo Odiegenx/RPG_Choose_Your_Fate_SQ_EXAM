@@ -13,4 +13,6 @@ public interface CharacterAvatarRepository extends JpaRepository<CharacterAvatar
     List<CharacterAvatar> findByChapter_Id(Integer chapterId);
 
     List<CharacterAvatar> findByScene_Id(Integer sceneId);
+
+    boolean existsByRaceDetails_Id(Integer raceDetailsId);
 }

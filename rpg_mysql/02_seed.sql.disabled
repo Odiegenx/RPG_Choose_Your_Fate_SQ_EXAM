@@ -1,3 +1,7 @@
+-- Disabled legacy seed script.
+-- This file is kept for reference only and is intentionally not executed by
+-- the MySQL Docker entrypoint because it no longer has a .sql extension.
+
 -- Removes foreign key restraints for easier seeding --
 SET FOREIGN_KEY_CHECKS=0;
 USE choose_your_fate;
@@ -146,5 +150,5 @@ INSERT INTO character_has_quest (character_id, quest_id, status) VALUES
 (2, 3, 0),   -- Lyra has witch quest, not complete
 (3, 1, 0);   -- Magnus has ale quest, not complete
 
--- Sets foreign key restraints to normal -- 
+-- Sets foreign key restraints to normal --
 SET FOREIGN_KEY_CHECKS=1;

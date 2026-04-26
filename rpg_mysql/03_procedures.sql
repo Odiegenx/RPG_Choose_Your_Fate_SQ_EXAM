@@ -19,7 +19,7 @@ DECLARE v_scene_chapter_id INT;
 SELECT character_limit INTO v_character_limit
 FROM account WHERE id = p_account_id;
 
-SELECT COUNT(character_id) INTO v_character_count
+SELECT COUNT(id) INTO v_character_count
 FROM `character_avatar` WHERE account_id = p_account_id;
 
 SELECT chapter_id INTO v_scene_chapter_id
