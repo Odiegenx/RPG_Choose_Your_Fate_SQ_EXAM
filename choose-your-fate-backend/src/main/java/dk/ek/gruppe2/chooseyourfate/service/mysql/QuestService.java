@@ -16,8 +16,8 @@ import java.util.List;
 @Service
 public class QuestService {
 
-    QuestRepository questRepository;
-    SceneRepository sceneRepository;
+    private final QuestRepository questRepository;
+    private final SceneRepository sceneRepository;
 
     public QuestService(QuestRepository questRepository, SceneRepository sceneRepository) {
         this.questRepository = questRepository;
