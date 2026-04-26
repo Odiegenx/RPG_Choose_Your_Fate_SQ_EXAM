@@ -18,7 +18,7 @@ public class InventoryController {
     }
 
     @GetMapping("/{id}")
-    public InventoryResponseDTO getInvetoryData(@PathVariable Integer id) {
+    public InventoryResponseDTO getInventoryData(@PathVariable Integer id) {
         return inventoryService.getInventoryData(id);
     }
 }
