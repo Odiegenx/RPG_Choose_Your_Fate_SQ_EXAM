@@ -30,7 +30,7 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<Boolean> createItem(@RequestBody ItemRequestDTO requestDTO) {
-        return itemService.CreateItem(requestDTO);
+        return itemService.createItem(requestDTO);
     }
 
     @PutMapping("/{id}")
@@ -40,7 +40,7 @@ public class ItemController {
 
     @DeleteMapping("/{id}")
     public void deleteItem(@PathVariable("id") Integer id) {
-        itemService.DeleteItem(id);
+        itemService.deleteItem(id);
     }
 }
 
