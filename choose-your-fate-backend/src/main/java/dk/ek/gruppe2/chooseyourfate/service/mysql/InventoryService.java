@@ -18,12 +18,10 @@ public class InventoryService {
 
     InventoryRepository inventoryRepository;
     InventoryHasItemRepository inventoryHasItemRepository;
-    CharacterAvatarRepository characterAvatarRepository;
 
-    public InventoryService(InventoryRepository inventoryRepository, InventoryHasItemRepository inventoryHasItemRepository, CharacterAvatarRepository characterAvatarRepository) {
+    public InventoryService(InventoryRepository inventoryRepository, InventoryHasItemRepository inventoryHasItemRepository) {
         this.inventoryRepository = inventoryRepository;
         this.inventoryHasItemRepository = inventoryHasItemRepository;
-        this.characterAvatarRepository = characterAvatarRepository;
     }
 
     public InventoryResponseDTO getInventoryData(Integer id) {
