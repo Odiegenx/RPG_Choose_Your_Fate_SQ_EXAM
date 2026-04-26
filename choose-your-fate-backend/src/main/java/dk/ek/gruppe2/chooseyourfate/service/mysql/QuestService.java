@@ -36,11 +36,11 @@ public class QuestService {
         return response;
     }
 
-    public ResponseEntity<Boolean> createQuest(QuestRequestDTO questRequestDTO) {
+    public ResponseEntity<QuestResponseDTO> createQuest(QuestRequestDTO questRequestDTO) {
         Scene scene = sceneRepository.findById(questRequestDTO.getScene_id()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));;
         Quest quest = questRequestDTO.getQuestEntity(scene);
-        questRepository.save(quest);
-        return ResponseEntity.ok(true);
+        Quest savedQuest = questRepository.save(quest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new QuestResponseDTO(savedQuest));
     }
 
     public QuestResponseDTO updateQuest(Integer id, QuestRequestDTO questRequestDTO) {
