@@ -1,17 +1,17 @@
+import CharacterView from "../components/CharacterView/CharacterView";
 import { useAuth } from "../context/AuthContext";
 
 export default function Account() {
-  const { user, setUser } = useAuth();
-
-  const logout = () => {
-    setUser(null);
-  };
+  const { token, logout } = useAuth();
 
   return (
-    <div>
-      <h1>Account</h1>
-      <p>Welcome {user?.username}</p>
+    <div className="flow-root">
+      <p>
+        You are logged in {token ? "(token present)" : "(no token)"}
+      </p>
+
       <button onClick={logout}>Logout</button>
+      <CharacterView />
     </div>
   );
 }

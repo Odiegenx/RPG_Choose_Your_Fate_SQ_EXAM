@@ -47,10 +47,10 @@ export default function Login() {
         />
 
         <div className="button-placement">
-          <button onClick={handleLogin}>Login</button>
           <button onClick={() => navigate("/register")}>
             Go to Register
           </button>
+          <button onClick={handleLogin}>Login</button>
         </div>
       </div>
     </div>

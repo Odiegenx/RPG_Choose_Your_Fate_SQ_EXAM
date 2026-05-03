@@ -27,7 +27,7 @@ export const scenes: Record<number, Scene> = {
   2: {
     id: 2,
     dialog: ["Illusion of choice...", "..."],
-    img: "../images/Show.png",
+    img: "../images/ShowSecond.png",
     choices: [
       { id: 0, name: "Back", destination_id: 0 }
     ]

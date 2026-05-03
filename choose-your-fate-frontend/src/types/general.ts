@@ -15,10 +15,34 @@ export type Choice = {
     destination_id: number    
 };
 
-export interface IProps {
-    testMethod?: Function
+export type Character = {
+  id: number;
+  accountId: number;
+  chapterId: number;
+  sceneId: number;
+  raceDetailsId: number;
+  name: string;
 };
 
-export interface IState {
-    currentScene: number
+export type Props = {
+  character: Character;
+};
+
+export type CharacterWindowProps = {
+  character: Character;
+  onSelect: (character: Character) => void;
+};
+
+export type CharacterListProps = {
+  onSelect: (character: Character) => void;
+}
+
+export type InventoryItem = {
+  id: number;
+  name: string;
+};
+
+export type EquipmentItem = {
+  id: number;
+  name: string;
 };

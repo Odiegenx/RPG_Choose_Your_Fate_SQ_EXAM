@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTypewriter } from "../../hooks/useTypewriter";
-import type { Scene } from "../../types/general";
+import type { Choice, Scene } from "../../types/general";
 import "./ShowDialog.css";
 
 type Props = {
@@ -10,13 +10,21 @@ type Props = {
 
 export function ShowDialog({ nextscene, changeScene }: Props) {
   const [index, setIndex] = useState(0);
-
+  const [lastDialog, setLastDialog] = useState(false);
   const text = nextscene.dialog[index];
   const typed = useTypewriter(text);
+
+  useEffect(() => {
+    setIndex(0);
+    setLastDialog(false);
+  }, [nextscene.id]);
 
   function nextLine() {
     if (index < nextscene.dialog.length - 1) {
       setIndex(index + 1);
+    }
+    if(index >= nextscene.dialog.length - 2){
+      setLastDialog(true);
     }
   }
 
@@ -25,7 +33,7 @@ export function ShowDialog({ nextscene, changeScene }: Props) {
       <img
         src={nextscene.img}
         alt="scene"
-        style={{ width: "100vw", height: "100vh", objectFit: "contain" }}
+        style={{ width: "100vw", height: "99vh", objectFit: "contain" }}
       />
 
       <div className="dialogContainer">
@@ -33,18 +41,19 @@ export function ShowDialog({ nextscene, changeScene }: Props) {
           {typed}
         </div>
       </div>
-
+      {lastDialog && (
       <div className="dialogChoiceContainer">
-        {nextscene.choices.map((choice: any) => (
+        {nextscene.choices.map((choice: Choice) => (
           <div
             key={choice.id}
             className="choice"
-            onClick={() => changeScene(choice.next)}
+            onClick={() => changeScene(choice.destination_id)}
           >
             {choice.name}
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }

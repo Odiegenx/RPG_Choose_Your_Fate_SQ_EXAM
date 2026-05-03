@@ -1,3 +1,5 @@
+import { useAuth } from "../context/AuthContext";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function login(username: string, password: string) {
@@ -19,6 +21,23 @@ export async function register(username: string, email: string, password: string
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email, password }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Login failed");
+  }
+
+  return res.json();
+}
+
+export async function apiGet(apiPath: String) {
+  const { token } = useAuth();
+  const res = await fetch(`${API_URL}choose-your-fate/${apiPath}`, {
+    method: "GET",
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+     },
   });
 
   if (!res.ok) {
