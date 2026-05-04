@@ -5,6 +5,7 @@ import dk.ek.gruppe2.chooseyourfate.dto.AiResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.service.AiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/ai")
-@Tag(name = "AI", description = "Endpoints for AI-generated content using local LLM via Ollama")
+@Tag(name = "AI", description = "Endpoints for AI-generated content using a configured LLM provider")
 public class AiController {
 
     private final AiService aiService;
@@ -26,9 +27,9 @@ public class AiController {
     @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#request.characterId, authentication)")
     @Operation(
         summary = "Ask the AI",
-        description = "Sends a request to the LLM. The model will autonomously call the relevant tools to fetch data and generate a response. Possible request types: CHARACTER_RECAP, PATH_SUMMARY"
+        description = "Sends a request to the configured AI provider. The model will autonomously call the relevant tools to fetch data and generate a response. Possible request types: CHARACTER_RECAP, PATH_SUMMARY"
     )
-    public AiResponseDTO ask(@RequestBody AiRequestDTO request) {
+    public AiResponseDTO ask(@Valid @RequestBody AiRequestDTO request) {
         return new AiResponseDTO(aiService.handleRequest(request));
     }
 }

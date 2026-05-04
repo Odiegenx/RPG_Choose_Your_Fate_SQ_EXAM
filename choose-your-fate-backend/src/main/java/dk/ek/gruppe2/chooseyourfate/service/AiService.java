@@ -1,8 +1,10 @@
 package dk.ek.gruppe2.chooseyourfate.service;
 
 import dk.ek.gruppe2.chooseyourfate.ai.AiTools;
+import dk.ek.gruppe2.chooseyourfate.config.AiDeploymentProperties;
 import dk.ek.gruppe2.chooseyourfate.dto.AiRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.enums.AiRequestType;
+import dk.ek.gruppe2.chooseyourfate.exception.AiServiceException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
@@ -11,20 +13,44 @@ public class AiService {
 
     private final ChatClient chatClient;
     private final AiTools aiTools;
+    private final AiDeploymentProperties aiDeploymentProperties;
 
-    public AiService(ChatClient.Builder chatClientBuilder, AiTools aiTools) {
+    public AiService(
+        ChatClient.Builder chatClientBuilder,
+        AiTools aiTools,
+        AiDeploymentProperties aiDeploymentProperties
+    ) {
         this.chatClient = chatClientBuilder.build();
         this.aiTools = aiTools;
+        this.aiDeploymentProperties = aiDeploymentProperties;
     }
 
     public String handleRequest(AiRequestDTO request) {
-        String raw = chatClient.prompt()
-            .system(resolveSystemPrompt(request.getRequestType()))
-            .user(buildUserMessage(request))
-            .tools(aiTools)
-            .call()
-            .content();
-        return raw != null ? stripMarkdown(raw) : "";
+        validateRequest(request);
+
+        if (!aiDeploymentProperties.isEnabled()) {
+            throw new AiServiceException("AI is currently disabled for this deployment.");
+        }
+
+        try {
+            String raw = chatClient.prompt()
+                .system(resolveSystemPrompt(request.getRequestType()))
+                .user(buildUserMessage(request))
+                .tools(aiTools)
+                .call()
+                .content();
+
+            if (raw == null) {
+                return "";
+            }
+
+            return aiDeploymentProperties.isStripMarkdown() ? stripMarkdown(raw) : raw.trim();
+        } catch (Exception ex) {
+            throw new AiServiceException(
+                "AI provider request failed. Check AI deployment configuration and provider availability.",
+                ex
+            );
+        }
     }
 
     private String stripMarkdown(String text) {
@@ -33,6 +59,18 @@ public class AiService {
             .replaceAll("\\*([^*]+)\\*", "$1")
             .replaceAll("(?m)^#{1,6}\\s*", "")
             .trim();
+    }
+
+    private void validateRequest(AiRequestDTO request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request body is required.");
+        }
+        if (request.getRequestType() == null) {
+            throw new IllegalArgumentException("requestType is required.");
+        }
+        if (request.getCharacterId() == null) {
+            throw new IllegalArgumentException("characterId is required.");
+        }
     }
 
     private String resolveSystemPrompt(AiRequestType type) {

@@ -3,10 +3,12 @@ package dk.ek.gruppe2.chooseyourfate.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -42,6 +44,21 @@ public class GlobalExceptionHandler {
         ));
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidation(MethodArgumentNotValidException ex) {
+        var errors = new LinkedHashMap<String, String>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage()));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "timestamp", LocalDateTime.now().toString(),
+                "status", 400,
+                "error", "Bad Request",
+                "message", "Validation failed",
+                "details", errors
+        ));
+    }
+
     @ExceptionHandler(UnsupportedOperationException.class)
     public ResponseEntity<?> handleUnsupportedOperation(UnsupportedOperationException ex) {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(Map.of(
@@ -58,6 +75,16 @@ public class GlobalExceptionHandler {
                 "timestamp", LocalDateTime.now().toString(),
                 "status", 403,
                 "error", "Forbidden",
+                "message", ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(AiServiceException.class)
+    public ResponseEntity<?> handleAiService(AiServiceException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
+                "timestamp", LocalDateTime.now().toString(),
+                "status", 503,
+                "error", "Service Unavailable",
                 "message", ex.getMessage()
         ));
     }
