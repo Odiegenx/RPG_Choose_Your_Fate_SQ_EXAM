@@ -8,6 +8,8 @@ import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
 import dk.ek.gruppe2.chooseyourfate.interfaces.AccountDataAccess;
 import dk.ek.gruppe2.chooseyourfate.model.neo4j.AccountNode;
 import dk.ek.gruppe2.chooseyourfate.repository.neo4j.AccountNodeRepository;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.Session;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +21,39 @@ public class Neo4jAccountService implements AccountDataAccess {
     private final AccountNodeRepository accountNodeRepository;
     private final PasswordEncoder encoder;
 
-    public Neo4jAccountService(AccountNodeRepository accountNodeRepository, PasswordEncoder encoder) {
+    private final Driver neo4jDriver;
+
+    public Neo4jAccountService(AccountNodeRepository accountNodeRepository, PasswordEncoder encoder, Driver neo4jDriver) {
         this.accountNodeRepository = accountNodeRepository;
         this.encoder = encoder;
+        this.neo4jDriver = neo4jDriver;
     }
+
+//    @Override
+//    public List<AccountResponseDTO> getAllAccounts() {
+//        return accountNodeRepository.findAll()
+//                .stream()
+//                .map(this::toDto)
+//                .toList();
+//    }
 
     @Override
     public List<AccountResponseDTO> getAllAccounts() {
-        return accountNodeRepository.findAll()
-                .stream()
-                .map(this::toDto)
-                .toList();
+        try (Session session = neo4jDriver.session()) {
+            return session.executeRead(tx ->
+                    tx.run("""
+                MATCH (a:Account)
+                RETURN a.id AS id, a.username AS username, a.characterLimit AS characterLimit, a.email AS email
+                ORDER BY a.id
+            """).list(accountFound -> new AccountResponseDTO(
+                            accountFound.get("id").asInt(),
+                            accountFound.get("username").asString(),
+                            accountFound.get("characterLimit").asInt(),
+                            accountFound.get("email").asString()
+                    ))
+            );
+        }
+
     }
 
     @Override
