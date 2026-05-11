@@ -1,7 +1,6 @@
 package dk.ek.gruppe2.chooseyourfate.controller;
 
 import dk.ek.gruppe2.chooseyourfate.dto.InventoryResponseDTO;
-import dk.ek.gruppe2.chooseyourfate.dto.ItemRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.service.mysql.InventoryService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +19,7 @@ public class InventoryController {
         return inventoryService.getInventoryData(id);
     }
 
-    @PostMapping("/{id}/items/{itemIdd}")
+    @PostMapping("/{id}/items/{itemId}")
     public void addItemToInventory(@PathVariable Integer id, @PathVariable Integer itemId) {
         inventoryService.addItemToInventory(id, itemId);
     }

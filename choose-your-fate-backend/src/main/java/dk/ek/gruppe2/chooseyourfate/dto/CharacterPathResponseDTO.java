@@ -6,4 +6,11 @@ public record CharacterPathResponseDTO(
         String summary,
         byte[] audioBlob
 ) {
+    public CharacterPathResponseDTO(
+            Integer id,
+            Integer characterId,
+            String summary
+    ) {
+        this(id, characterId, summary, null);
+    }
 }

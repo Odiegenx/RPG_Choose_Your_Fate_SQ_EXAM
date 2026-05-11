@@ -106,7 +106,7 @@ public class SqlEquipmentService implements EquipmentDataAccess {
             return null;
         }
 
-        return itemService.findById(itemId).toItem();
+        return itemService.getItemEntity(itemId);
     }
 
     private EquipmentResponseDTO toDto(Equipment equipment) {

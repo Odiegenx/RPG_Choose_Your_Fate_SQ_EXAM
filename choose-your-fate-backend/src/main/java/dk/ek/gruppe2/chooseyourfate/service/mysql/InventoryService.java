@@ -50,7 +50,7 @@ public class InventoryService {
     public void addItemToInventory(Integer inventoryId, Integer itemId) {
         Inventory inventory = inventoryRepository.findById(inventoryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        Item item = itemService.findById(itemId).toItem();
+        Item item = itemService.getItemEntity(itemId);  // Changed this line
         inventoryHasItemRepository.save(new InventoryHasItem(item, inventory, 1));
     }
 

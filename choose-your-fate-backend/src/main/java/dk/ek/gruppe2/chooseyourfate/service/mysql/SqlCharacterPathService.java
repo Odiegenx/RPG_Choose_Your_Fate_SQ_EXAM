@@ -51,8 +51,7 @@ public class SqlCharacterPathService implements CharacterPathDataAccess {
         return new CharacterPathResponseDTO(
                 characterPath.getId(),
                 characterPath.getCharacter().getId(),
-                characterPath.getSummary(),
-                characterPath.getAudioBlob()
+                characterPath.getSummary()
         );
     }
 }

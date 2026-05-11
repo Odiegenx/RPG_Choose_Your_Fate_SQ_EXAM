@@ -53,4 +53,9 @@ public class ItemService {
         }
         itemRepository.deleteById(itemId);
     }
+
+    public Item getItemEntity(Integer id) {
+        return itemRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
 }

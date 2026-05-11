@@ -23,14 +23,4 @@ public class ItemResponseDTO {
         this.description = item.getDescription();
         this.type = item.getType();
     }
-
-    public Item toItem() {
-        Item item = new Item();
-        item.setId(id);
-        item.setName(name);
-        item.setDescription(description);
-        item.setType(type);
-        return item;
-    }
-
 }
