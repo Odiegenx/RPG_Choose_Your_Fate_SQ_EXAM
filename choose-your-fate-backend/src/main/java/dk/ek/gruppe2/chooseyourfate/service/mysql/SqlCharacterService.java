@@ -4,7 +4,10 @@ import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
 import dk.ek.gruppe2.chooseyourfate.interfaces.CharacterDataAccess;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.Chapter;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterAvatar;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.RaceDetails;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.Scene;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.ChapterRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterAvatarRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.RaceDetailsRepository;
@@ -55,6 +58,16 @@ public class SqlCharacterService implements CharacterDataAccess<Integer> {
 
     @Override
     public CharacterResponseDTO createCharacter(CreateCharacterRequestDTO request) {
+
+
+        if (request.getChapterId() == null || request.getSceneId() == null) {
+            RaceDetails raaceDetails = raceDetailsRepository.findById(request.getRaceDetailsId())
+            .orElseThrow(() -> new ResourceNotFoundException("Character not found with id: " +request.getRaceDetailsId()));
+
+            request.setChapterId(raaceDetails.getStartingChapter().getId());
+            request.setSceneId(raaceDetails.getStartingChapter().getStartingScene().getId());
+        }
+
         validateCreateRequest(request);
 
         StoredProcedureQuery storedProcedure = entityManager.createStoredProcedureQuery("sp_create_character");

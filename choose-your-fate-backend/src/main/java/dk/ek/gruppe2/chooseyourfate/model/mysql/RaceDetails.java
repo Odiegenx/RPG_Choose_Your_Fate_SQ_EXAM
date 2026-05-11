@@ -20,6 +20,10 @@ public class RaceDetails {
     @OneToMany(mappedBy = "raceDetails")
     private List<Npc> npcs = new ArrayList<>();
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "starting_chapter_id", nullable = false)
+    private Chapter startingChapter;
+
     public RaceDetails() {}
 
     public Integer getId() { return id; }
@@ -37,5 +41,13 @@ public class RaceDetails {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Chapter getStartingChapter() {
+        return startingChapter;
+    }
+
+    public void setStartingChapter(Chapter startingChapter) {
+        this.startingChapter = startingChapter;
     }
 }

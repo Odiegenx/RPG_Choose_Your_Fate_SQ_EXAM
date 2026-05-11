@@ -1,10 +1,15 @@
 package dk.ek.gruppe2.chooseyourfate.dto;
 
-public class CreateCharacterRequestDTO {
+import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 
+public class CreateCharacterRequestDTO {
+    @NotNull
     private Integer accountId;
+
     private Integer chapterId;
     private Integer sceneId;
+    
+    @NotNull
     private Integer raceDetailsId;
     private String name;
 

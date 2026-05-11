@@ -38,7 +38,13 @@ DEFAULT CHARACTER SET = utf8mb3;
 CREATE TABLE IF NOT EXISTS `choose_your_fate`.`chapter` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`))
+  `starting_scene_id` INT NULL, -- Has to not be NOT NULL, since it otherwise creates a loop with scenes table which needs a chapter to be created
+  PRIMARY KEY (`id`),
+  INDEX `starting_scene_idx` (`starting_scene_id` ASC) VISIBLE,
+  CONSTRAINT `fk_starting_scene_chapter`
+    FOREIGN KEY (`starting_scene_id`)
+    REFERENCES `choose_your_fate`.`scene` (`id`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
@@ -49,7 +55,13 @@ DEFAULT CHARACTER SET = utf8mb3;
 CREATE TABLE IF NOT EXISTS `choose_your_fate`.`race_details` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'BOB rules them all!',
   `name` VARCHAR(100) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`))
+  `starting_chapter_id` INT NOT NULL, -- needed to determine where the character starts on creating new character
+  PRIMARY KEY (`id`),
+  INDEX `starting_chapter_idx` (`starting_chapter_id` ASC) VISIBLE,
+  CONSTRAINT `fk_starting_chapter_race_details`
+    FOREIGN KEY (`starting_chapter_id`)
+    REFERENCES `choose_your_fate`.`chapter` (`id`)
+  )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
