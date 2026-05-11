@@ -14,7 +14,7 @@ import java.io.IOException;
 @Service
 public class TTSService {
 
-    public final CharacterPathRepository characterPathRepository;
+    private final CharacterPathRepository characterPathRepository;
 
     public TTSService(CharacterPathRepository characterPathRepository) {
         this.characterPathRepository = characterPathRepository;
