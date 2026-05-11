@@ -3,16 +3,11 @@ package dk.ek.gruppe2.chooseyourfate.controller;
 import dk.ek.gruppe2.chooseyourfate.dto.AiRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.AiResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.service.AiService;
-import dk.ek.gruppe2.chooseyourfate.service.TTSService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/ai")
