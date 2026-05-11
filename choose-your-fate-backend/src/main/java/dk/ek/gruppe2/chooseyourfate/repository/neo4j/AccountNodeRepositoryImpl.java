@@ -19,6 +19,13 @@ public class AccountNodeRepositoryImpl implements AccountNodeRepository {
     @PostConstruct
     void ensureConstraints() {
         neo4jClient.query("""
+                        CREATE CONSTRAINT counter_name_unique IF NOT EXISTS
+                        FOR (c:Counter)
+                        REQUIRE c.name IS UNIQUE
+                        """)
+                .run();
+
+        neo4jClient.query("""
                         CREATE CONSTRAINT account_id IF NOT EXISTS
                         FOR (a:Account)
                         REQUIRE a.id IS UNIQUE
@@ -133,7 +140,10 @@ public class AccountNodeRepositoryImpl implements AccountNodeRepository {
                         WITH coalesce(max(a.id), 0) AS maxExistingId
                         MERGE (counter:Counter {name: 'account'})
                         ON CREATE SET counter.value = maxExistingId
-                        WITH counter
+                        SET counter.value = CASE
+                            WHEN counter.value < maxExistingId THEN maxExistingId
+                            ELSE counter.value
+                        END
                         SET counter.value = counter.value + 1
                         RETURN counter.value AS nextId
                         """)
