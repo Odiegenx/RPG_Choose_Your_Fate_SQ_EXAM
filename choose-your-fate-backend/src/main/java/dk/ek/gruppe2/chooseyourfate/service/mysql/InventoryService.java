@@ -20,8 +20,8 @@ import java.util.List;
 public class InventoryService {
 
     private final ItemService itemService;
-    InventoryRepository inventoryRepository;
-    InventoryHasItemRepository inventoryHasItemRepository;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryHasItemRepository inventoryHasItemRepository;
 
     public InventoryService(InventoryRepository inventoryRepository, InventoryHasItemRepository inventoryHasItemRepository, ItemService itemService) {
         this.inventoryRepository = inventoryRepository;
@@ -40,6 +40,11 @@ public class InventoryService {
     public InventoryResponseDTO getInventoryByCharacterId(Integer characterId) {
         Inventory inventory = inventoryRepository.findByCharacter_Id(characterId);
         return toDTO(inventory);
+    }
+
+    public Inventory getInventoryEntityByCharacterId(Integer characterId) {
+        Inventory inventory = inventoryRepository.findByCharacter_Id(characterId);
+        return inventory;
     }
 
     @Transactional

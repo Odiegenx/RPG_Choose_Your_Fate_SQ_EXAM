@@ -2,7 +2,6 @@ package dk.ek.gruppe2.chooseyourfate.repository.mysql;
 
 import dk.ek.gruppe2.chooseyourfate.model.mysql.InventoryHasItem;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.InventoryHasItemId;
-import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

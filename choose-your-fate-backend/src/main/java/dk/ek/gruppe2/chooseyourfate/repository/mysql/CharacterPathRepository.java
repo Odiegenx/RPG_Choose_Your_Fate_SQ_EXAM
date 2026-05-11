@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CharacterPathRepository extends JpaRepository<CharacterPath, Integer> {
-    Optional<CharacterPath> findByCharacter_Id(Integer characterId);
+    CharacterPath findByCharacter_Id(Integer characterId);
 }

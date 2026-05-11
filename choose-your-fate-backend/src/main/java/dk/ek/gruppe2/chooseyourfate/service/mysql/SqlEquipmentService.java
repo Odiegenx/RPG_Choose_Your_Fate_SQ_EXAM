@@ -58,7 +58,7 @@ public class SqlEquipmentService implements EquipmentDataAccess {
 
     private EquipmentResponseDTO equipItem(Integer characterId, UpdateEquipmentRequestDTO request) {
         Equipment equipment = getEquipmentEntity(characterId);
-        Inventory inventory = inventoryService.inventoryRepository.findByCharacter_Id(characterId);
+        Inventory inventory = inventoryService.getInventoryEntityByCharacterId(characterId);
         switch (request.getType()) {
             case "armor_head" -> {
                 equipment.setHead(resolveItem(request.getItemId()));
@@ -76,7 +76,7 @@ public class SqlEquipmentService implements EquipmentDataAccess {
 
     private EquipmentResponseDTO unequipItem(Integer characterId, UpdateEquipmentRequestDTO request) {
         Equipment equipment = getEquipmentEntity(characterId);
-        Inventory inventory = inventoryService.inventoryRepository.findByCharacter_Id(characterId);
+        Inventory inventory = inventoryService.getInventoryEntityByCharacterId(characterId);
         Integer itemId = null;
         switch (request.getType()) {
             case "armor_head" -> {

@@ -14,18 +14,18 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
-    @GetMapping("/{id}")
-    public InventoryResponseDTO getInventoryData(@PathVariable Integer id) {
-        return inventoryService.getInventoryData(id);
+    @GetMapping("/{inventoryId}")
+    public InventoryResponseDTO getInventoryData(@PathVariable Integer inventoryId) {
+        return inventoryService.getInventoryData(inventoryId);
     }
 
-    @PostMapping("/{id}/items/{itemId}")
-    public void addItemToInventory(@PathVariable Integer id, @PathVariable Integer itemId) {
-        inventoryService.addItemToInventory(id, itemId);
+    @PostMapping("/{inventoryId}/items/{itemId}")
+    public void addItemToInventory(@PathVariable Integer inventoryId, @PathVariable Integer itemId) {
+        inventoryService.addItemToInventory(inventoryId, itemId);
     }
 
-    @PostMapping("/{id}/items/{itemId}/use")
-    public void useItem(@PathVariable Integer id, @PathVariable Integer itemId) {
-        inventoryService.useItem(id, itemId);
+    @PostMapping("/{inventoryId}/items/{itemId}/use")
+    public void useItem(@PathVariable Integer inventoryId, @PathVariable Integer itemId) {
+        inventoryService.useItem(inventoryId, itemId);
     }
 }

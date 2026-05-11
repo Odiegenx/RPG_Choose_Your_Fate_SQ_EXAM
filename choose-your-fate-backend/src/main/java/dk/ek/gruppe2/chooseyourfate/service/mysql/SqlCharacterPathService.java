@@ -40,7 +40,7 @@ public class SqlCharacterPathService implements CharacterPathDataAccess {
     }
 
     private CharacterPath getCharacterPathEntity(Integer characterId) {
-        CharacterPath characterPath = characterPathRepository.findByCharacter_Id(characterId).orElseThrow(() -> new ResourceNotFoundException("CharacterPath not found with characterId: " + characterId));;
+        CharacterPath characterPath = characterPathRepository.findByCharacter_Id(characterId);
         if (characterPath == null) {
             throw new ResourceNotFoundException("Character path not found for character id: " + characterId);
         }

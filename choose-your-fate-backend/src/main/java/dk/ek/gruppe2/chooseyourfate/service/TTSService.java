@@ -24,7 +24,7 @@ public class TTSService {
     }
 
     public byte[] textToSpeech(Integer characterId) {
-        CharacterPath characterPath = characterPathRepository.findByCharacter_Id(characterId).orElseThrow(() -> new ResourceNotFoundException("CharacterPath not found with characterId: " + characterId));
+        CharacterPath characterPath = characterPathRepository.findByCharacter_Id(characterId);
         if (characterPath.getAudioBlob() != null && AudioUpdatedAfterSummary(characterPath.getSummary_updated_at(), characterPath.getAudio_blob_updated_at())) {
             return characterPath.getAudioBlob();
         }

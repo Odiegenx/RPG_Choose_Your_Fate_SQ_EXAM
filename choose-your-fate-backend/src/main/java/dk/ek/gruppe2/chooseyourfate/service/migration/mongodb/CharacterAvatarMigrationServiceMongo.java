@@ -128,8 +128,7 @@ public class CharacterAvatarMigrationServiceMongo {
     }
 
     private CharacterPathMongo transformPath(Integer characterId) {
-        CharacterPath path = characterPathRepository.findByCharacter_Id(characterId).orElseThrow(() -> new ResourceNotFoundException("CharacterPath not found with characterId: " + characterId));;
-
+        CharacterPath path = characterPathRepository.findByCharacter_Id(characterId);
         List<ChoiceMadeMongo> choicesMade = characterPathChoiceRepository
                 .findByCharacterPath_Id(path.getId())
                 .stream()
