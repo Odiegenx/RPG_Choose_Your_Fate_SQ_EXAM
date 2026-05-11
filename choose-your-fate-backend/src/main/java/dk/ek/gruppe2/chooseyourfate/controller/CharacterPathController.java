@@ -43,7 +43,7 @@ public class CharacterPathController {
         return characterPathService.getCharacterPathByCharacterId(dataSource, characterId);
     }
 
-    @GetMapping("/{characterId}")
+    @GetMapping("/{characterId}/audio")
     public ResponseEntity<byte[]> textToSpeech(@PathVariable Integer characterId) {
         byte[] bytes = ttsService.textToSpeech(characterId);
         return ResponseEntity.ok()
