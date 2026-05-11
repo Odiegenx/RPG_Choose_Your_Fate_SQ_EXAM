@@ -1,5 +1,6 @@
 package dk.ek.gruppe2.chooseyourfate.service;
 
+import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterPath;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterPathRepository;
 import org.springframework.ai.audio.tts.TextToSpeechPrompt;
 import org.springframework.ai.audio.tts.TextToSpeechResponse;
@@ -19,7 +20,20 @@ public class TTSService {
         this.characterPathRepository = characterPathRepository;
     }
 
-    public byte[] createAudioBlob(String text) throws IOException {
+    public byte[] textToSpeech(Integer characterId) {
+        CharacterPath characterPath = characterPathRepository.findByCharacter_Id(characterId);
+        if (characterPath.getAudioBlob() != null) {
+            return characterPath.getAudioBlob();
+        }
+        else {
+            byte[] audioBlob = createAudioBlob(characterPath.getSummary());
+            characterPath.setAudioBlob(audioBlob);
+            characterPathRepository.save(characterPath);
+            return audioBlob;
+        }
+    }
+
+    public byte[] createAudioBlob(String text) {
         ElevenLabsApi elevenLabsApi = ElevenLabsApi.builder()
                 .apiKey(System.getenv("ELEVEN_LABS_API_KEY"))
                 .build();
@@ -37,11 +51,7 @@ public class TTSService {
         TextToSpeechPrompt speechPrompt = new TextToSpeechPrompt(text);
         TextToSpeechResponse response = elevenLabsTextToSpeechModel.call(speechPrompt);
 
-        byte[] audioBlob = response.getResult().getOutput();
-        return audioBlob;
+        return response.getResult().getOutput();
     }
-
-
-
 
 }
