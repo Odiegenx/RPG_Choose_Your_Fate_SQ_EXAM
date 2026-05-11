@@ -4,7 +4,6 @@ import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.service.CharacterService;
-import lombok.experimental.var;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -38,7 +37,7 @@ public class CharacterController {
     @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#id, authentication)")
     public CharacterResponseDTO getCharacterById(
             @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
-            @PathVariable Integer id
+            @PathVariable String id
     ) {
         
         return characterService.getCharacterById(dataSource, id);
@@ -57,7 +56,7 @@ public class CharacterController {
     @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#id, authentication)")
     public void deleteCharacter(
             @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
-            @PathVariable Integer id
+            @PathVariable String id
     ) {
         characterService.deleteCharacter(dataSource, id);
     }

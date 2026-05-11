@@ -1,6 +1,5 @@
 package dk.ek.gruppe2.chooseyourfate.service;
 
-import dk.ek.gruppe2.chooseyourfate.datasource.DataSourceResolver;
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
@@ -33,20 +32,20 @@ public class CharacterService {
         return resolveDataAccess(sourceHeader).getAllCharacters();
     }
 
-    public CharacterResponseDTO getCharacterById(DataSourceType sourceHeader, Integer id) {
-        return resolveDataAccess(sourceHeader).getCharacterById(id);
+    public CharacterResponseDTO getCharacterById(DataSourceType sourceHeader, String id) {
+        return resolveDataAccess(sourceHeader).getCharacterById(sourceHeader == DataSourceType.MONGODB ? id : Integer.parseInt(id));
     }
 
     public CharacterResponseDTO createCharacter(DataSourceType sourceHeader, CreateCharacterRequestDTO request) {
         return resolveDataAccess(sourceHeader).createCharacter(request);
     }
 
-    public void deleteCharacter(DataSourceType sourceHeader, Integer id) {
-        resolveDataAccess(sourceHeader).deleteCharacter(id);
+    public void deleteCharacter(DataSourceType sourceHeader, String id) {
+        resolveDataAccess(sourceHeader).deleteCharacter(sourceHeader == DataSourceType.MONGODB ? id : Integer.parseInt(id));
     }
 
     public List<CharacterResponseDTO> getCharactersByAccountId(DataSourceType sourceHeader, String id) {
-        return resolveDataAccess(sourceHeader).getCharactersByAccountId(id);
+        return resolveDataAccess(sourceHeader).getCharactersByAccountId(sourceHeader == DataSourceType.MONGODB ? id : Integer.parseInt(id));
     }
 
     private CharacterDataAccess resolveDataAccess(DataSourceType sourceHeader) {

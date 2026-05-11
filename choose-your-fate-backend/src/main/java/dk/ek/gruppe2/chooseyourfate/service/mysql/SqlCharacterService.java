@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class SqlCharacterService implements CharacterDataAccess {
+public class SqlCharacterService implements CharacterDataAccess<Integer> {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -91,8 +91,8 @@ public class SqlCharacterService implements CharacterDataAccess {
 
     //Made to retreive all characters connected to the account that is logged in.
     @Override
-    public List<CharacterResponseDTO> getCharactersByAccountId(String id) {
-        return getCharacterentitesByAccountId(Integer.parseInt(id)).stream()
+    public List<CharacterResponseDTO> getCharactersByAccountId(Integer id) {
+        return getCharacterentitesByAccountId(id).stream()
                 .map(this::toDto)
                 .toList();
     }

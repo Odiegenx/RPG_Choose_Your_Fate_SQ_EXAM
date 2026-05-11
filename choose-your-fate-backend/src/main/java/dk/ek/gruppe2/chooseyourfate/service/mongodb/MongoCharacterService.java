@@ -4,7 +4,6 @@ import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.interfaces.CharacterDataAccess;
 import dk.ek.gruppe2.chooseyourfate.model.mongodb.CharacterAvatarDocumentMongo;
-import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterAvatar;
 import dk.ek.gruppe2.chooseyourfate.repository.mongodb.CharacterAvatarRepositoryMongo;
 
 import org.springframework.stereotype.Service;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class MongoCharacterService implements CharacterDataAccess {
+public class MongoCharacterService implements CharacterDataAccess<String> {
     private final CharacterAvatarRepositoryMongo characterAvatarRepository;
 
     public MongoCharacterService(CharacterAvatarRepositoryMongo characterAvatarRepository) {
@@ -27,7 +26,7 @@ public class MongoCharacterService implements CharacterDataAccess {
     }
 
     @Override
-    public CharacterResponseDTO getCharacterById(Integer id) {
+    public CharacterResponseDTO getCharacterById(String id) {
         throw new UnsupportedOperationException(MESSAGE);
     }
 
@@ -37,7 +36,7 @@ public class MongoCharacterService implements CharacterDataAccess {
     }
 
     @Override
-    public void deleteCharacter(Integer id) {
+    public void deleteCharacter(String id) {
         throw new UnsupportedOperationException(MESSAGE);
     }
 

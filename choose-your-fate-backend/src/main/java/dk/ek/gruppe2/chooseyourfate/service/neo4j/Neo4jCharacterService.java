@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class Neo4jCharacterService implements CharacterDataAccess {
+public class Neo4jCharacterService implements CharacterDataAccess<Integer> {
 
     private static final String MESSAGE =
             "Neo4j character functionality is planned to create a minimal subgraph and is not implemented yet";
@@ -35,7 +35,7 @@ public class Neo4jCharacterService implements CharacterDataAccess {
     }
 
     @Override
-    public List<CharacterResponseDTO> getCharactersByAccountId(String id) {
+    public List<CharacterResponseDTO> getCharactersByAccountId(Integer id) {
         throw new UnsupportedOperationException(MESSAGE);
     }
 }
