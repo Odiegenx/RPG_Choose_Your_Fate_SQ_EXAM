@@ -9,6 +9,7 @@ import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterAvatarRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.InventoryHasItemRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.InventoryRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,12 +19,14 @@ import java.util.List;
 @Service
 public class InventoryService {
 
+    private final ItemService itemService;
     InventoryRepository inventoryRepository;
     InventoryHasItemRepository inventoryHasItemRepository;
 
-    public InventoryService(InventoryRepository inventoryRepository, InventoryHasItemRepository inventoryHasItemRepository) {
+    public InventoryService(InventoryRepository inventoryRepository, InventoryHasItemRepository inventoryHasItemRepository, ItemService itemService) {
         this.inventoryRepository = inventoryRepository;
         this.inventoryHasItemRepository = inventoryHasItemRepository;
+        this.itemService = itemService;
     }
 
     public InventoryResponseDTO getInventoryData(Integer inventoryId) {
@@ -39,12 +42,16 @@ public class InventoryService {
         return toDTO(inventory);
     }
 
+    @Transactional
     public void removeItem(Integer inventoryId, Integer itemId) {
         inventoryHasItemRepository.deleteByInventoryIdAndItemId(inventoryId, itemId);
     }
 
     public void addItemToInventory(Integer inventoryId, Integer itemId) {
-        inventoryHasItemRepository.addByInventoryIdAndItemId(inventoryId, itemId);
+        Inventory inventory = inventoryRepository.findById(inventoryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Item item = itemService.findById(itemId).toItem();
+        inventoryHasItemRepository.save(new InventoryHasItem(item, inventory, 1));
     }
 
     private InventoryResponseDTO toDTO(Inventory inventory) {
