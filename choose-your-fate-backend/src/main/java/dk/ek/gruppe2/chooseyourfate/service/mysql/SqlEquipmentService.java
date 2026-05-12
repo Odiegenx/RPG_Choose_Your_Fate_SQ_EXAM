@@ -12,6 +12,7 @@ import dk.ek.gruppe2.chooseyourfate.repository.mysql.EquipmentRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.InventoryHasItemRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.ItemRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -90,6 +91,9 @@ public class SqlEquipmentService implements EquipmentDataAccess {
             case "armor_legs" -> {
                 itemId = equipment.getLegs().getId();
                 equipment.setLegs(null);
+            }
+            default -> {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item type is not supported for equipment");
             }
         }
         inventoryService.addItemToInventory(inventory.getId(), itemId);

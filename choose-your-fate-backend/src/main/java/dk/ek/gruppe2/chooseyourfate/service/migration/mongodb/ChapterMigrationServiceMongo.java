@@ -41,4 +41,9 @@ public class ChapterMigrationServiceMongo {
 
         log.info("Migrated {} chapters", entities.size());
     }
+
+    public void dropCollection() {
+        log.info("dropping collection chapters");
+        mongoRepo.deleteAll();
+    }
 }

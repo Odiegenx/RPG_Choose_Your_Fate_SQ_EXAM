@@ -158,4 +158,9 @@ public class CharacterAvatarMigrationServiceMongo {
                         .build())
                 .toList();
     }
+
+    public void dropCollection() {
+        log.info("dropping collection characters");
+        mongoRepo.deleteAll();
+    }
 }

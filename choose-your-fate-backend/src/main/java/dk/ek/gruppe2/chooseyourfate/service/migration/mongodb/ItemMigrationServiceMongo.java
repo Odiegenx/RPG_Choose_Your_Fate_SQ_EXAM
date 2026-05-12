@@ -42,5 +42,9 @@ public class ItemMigrationServiceMongo {
 
         log.info("Migrated {} items", entities.size());
     }
+    public void dropCollection() {
+        log.info("dropping collection items");
+        mongoRepo.deleteAll();
+    }
 
 }

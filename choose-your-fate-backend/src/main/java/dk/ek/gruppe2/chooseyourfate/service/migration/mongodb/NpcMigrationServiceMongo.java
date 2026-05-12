@@ -48,4 +48,9 @@ public class NpcMigrationServiceMongo {
 
         log.info("Migrated {} npcs", entities.size());
     }
+
+    public void dropCollection() {
+        log.info("dropping collection Npcs");
+        mongoRepo.deleteAll();
+    }
 }
