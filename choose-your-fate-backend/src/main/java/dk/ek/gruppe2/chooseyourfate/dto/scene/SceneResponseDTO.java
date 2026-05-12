@@ -1,11 +1,15 @@
 package dk.ek.gruppe2.chooseyourfate.dto.scene;
 
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Scene;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.Choice;
+import java.util.Comparator;
+import java.util.List;
 
 public class SceneResponseDTO {
     private Integer id;
     private Integer chapterId;
     private String name;
+    private List<ChoiceLookAheadResponseDTO> choices;
 
     public SceneResponseDTO() {
     }
@@ -20,6 +24,11 @@ public class SceneResponseDTO {
         this.id = scene.getId();
         this.name = scene.getName();
         this.chapterId = scene.getChapter().getId();
+        this.choices = scene.getChoices()
+                .stream()
+                .sorted(Comparator.comparing(Choice::getId))
+                .map(ChoiceLookAheadResponseDTO::new)
+                .toList();
     }
 
     public SceneResponseDTO toDTO(Scene scene) {
@@ -52,5 +61,13 @@ public class SceneResponseDTO {
 
     public void setChapterId(Integer chapterId) {
         this.chapterId = chapterId;
+    }
+
+    public List<ChoiceLookAheadResponseDTO> getChoices() {
+        return choices;
+    }
+
+    public void setChoices(List<ChoiceLookAheadResponseDTO> choices) {
+        this.choices = choices;
     }
 }

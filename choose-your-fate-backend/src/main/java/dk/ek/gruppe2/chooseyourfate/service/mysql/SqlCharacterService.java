@@ -1,13 +1,17 @@
 package dk.ek.gruppe2.chooseyourfate.service.mysql;
 
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.CharacterStatsDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.CharacterViewResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
 import dk.ek.gruppe2.chooseyourfate.interfaces.CharacterDataAccess;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterAvatar;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterDetails;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.AccountRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.ChapterRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterAvatarRepository;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterDetailsRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.RaceDetailsRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.SceneRepository;
 import jakarta.persistence.EntityManager;
@@ -25,6 +29,7 @@ public class SqlCharacterService implements CharacterDataAccess {
     private EntityManager entityManager;
 
     private final CharacterAvatarRepository characterAvatarRepository;
+    private final CharacterDetailsRepository characterDetailsRepository;
     private final AccountRepository accountRepository;
     private final ChapterRepository chapterRepository;
     private final SceneRepository sceneRepository;
@@ -32,12 +37,14 @@ public class SqlCharacterService implements CharacterDataAccess {
 
     public SqlCharacterService(
             CharacterAvatarRepository characterAvatarRepository,
+            CharacterDetailsRepository characterDetailsRepository,
             AccountRepository accountRepository,
             ChapterRepository chapterRepository,
             SceneRepository sceneRepository,
             RaceDetailsRepository raceDetailsRepository
     ) {
         this.characterAvatarRepository = characterAvatarRepository;
+        this.characterDetailsRepository = characterDetailsRepository;
         this.accountRepository = accountRepository;
         this.chapterRepository = chapterRepository;
         this.sceneRepository = sceneRepository;
@@ -55,6 +62,16 @@ public class SqlCharacterService implements CharacterDataAccess {
     @Override
     public CharacterResponseDTO getCharacterById(Integer id) {
         return toDto(getCharacterEntity(id));
+    }
+
+    // Builds one SQL-backed character view so the frontend does not need separate character and detail requests.
+    public CharacterViewResponseDTO getCharacterViewById(Integer id) {
+        CharacterDetails details = getCharacterDetailsEntity(id);
+        CharacterAvatar character = details.getCharacter();
+        long characterCount = characterAvatarRepository.countByAccount_Id(character.getAccount().getId());
+        Boolean canCreateMoreCharacters = characterCount < character.getAccount().getCharacterLimit();
+
+        return toViewDto(character, details, canCreateMoreCharacters);
     }
 
     @Override
@@ -98,9 +115,13 @@ public class SqlCharacterService implements CharacterDataAccess {
                 .orElseThrow(() -> new ResourceNotFoundException("Character not found with id: " + id));
     }
 
-    // In this SQL implementation, referenced entities are validated before insert so the service fails fast with clear errors
-    // and avoids database-level foreign key violations. This method also enforces domain-specific consistency, such as
-    // ensuring that the selected scene belongs to the selected chapter.
+    // Loads the auto-created stats row for a character.
+    private CharacterDetails getCharacterDetailsEntity(Integer characterId) {
+        return characterDetailsRepository.findByIdWithCharacterView(characterId)
+                .orElseThrow(() -> new ResourceNotFoundException("Character details not found for character id: " + characterId));
+    }
+
+    // Validates referenced entities before insert and checks that the selected scene belongs to the selected chapter.
     private void validateCreateRequest(CreateCharacterRequestDTO request) {
         if (!accountRepository.existsById(request.getAccountId())) {
             throw new ResourceNotFoundException("Account not found with id: " + request.getAccountId());
@@ -122,6 +143,7 @@ public class SqlCharacterService implements CharacterDataAccess {
         }
     }
 
+    // Maps the SQL character entity to the normal character response.
     private CharacterResponseDTO toDto(CharacterAvatar character) {
         return new CharacterResponseDTO(
                 character.getId(),
@@ -132,5 +154,32 @@ public class SqlCharacterService implements CharacterDataAccess {
                 character.getName(),
                 character.getFlag()
         );
+    }
+
+    // Maps character and detail data to the combined character view response.
+    private CharacterViewResponseDTO toViewDto(
+            CharacterAvatar character,
+            CharacterDetails details,
+            Boolean canCreateMoreCharacters
+    ) {
+        return new CharacterViewResponseDTO(
+                character.getId(),
+                character.getName(),
+                character.getChapter().getId(),
+                character.getChapter().getName(),
+                character.getRaceDetails().getId(),
+                getRaceDisplayName(character),
+                new CharacterStatsDTO(
+                        details.getIntelligence(),
+                        details.getCharisma(),
+                        details.getFashion()
+                ),
+                canCreateMoreCharacters
+        );
+    }
+
+    // Gives race_details a display label until the SQL schema stores real race names.
+    private String getRaceDisplayName(CharacterAvatar character) {
+        return "Race " + character.getRaceDetails().getId();
     }
 }
