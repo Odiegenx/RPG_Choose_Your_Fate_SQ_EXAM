@@ -21,7 +21,17 @@ public class MigrationRunner {
 
     public void runAll() {
         log.info("Starting full migration...");
+        log.info("Dropping collections");
+        raceDetailsMigrationService.dropCollection();
+        itemMigrationService.dropCollection();
+        chapterMigrationService.dropCollection();
+        accountMigrationService.dropCollection();
+        npcMigrationService.dropCollection();
+        sceneMigrationService.dropCollection();
+        questMigrationService.dropCollection();
+        characterMigrationService.dropCollection();
 
+        log.info("Migrating data");
         raceDetailsMigrationService.migrate();      // no dependencies
         itemMigrationService.migrate();             // no dependencies
         chapterMigrationService.migrate();          // no dependencies

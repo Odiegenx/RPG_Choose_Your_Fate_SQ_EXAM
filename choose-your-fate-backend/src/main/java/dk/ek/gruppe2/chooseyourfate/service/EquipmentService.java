@@ -40,14 +40,6 @@ public class EquipmentService {
         return resolveDataAccess(sourceHeader).getEquipmentByCharacterId(characterId);
     }
 
-    public EquipmentResponseDTO updateEquipment(
-            String sourceHeader,
-            Integer characterId,
-            UpdateEquipmentRequestDTO request
-    ) {
-        return resolveDataAccess(sourceHeader).updateEquipment(characterId, request);
-    }
-
     private EquipmentDataAccess resolveDataAccess(String sourceHeader) {
         DataSourceType dataSourceType = dataSourceResolver.resolve(sourceHeader);
         return switch (dataSourceType) {

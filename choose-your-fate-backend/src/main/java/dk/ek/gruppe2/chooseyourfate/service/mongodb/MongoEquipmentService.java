@@ -22,8 +22,4 @@ public class MongoEquipmentService implements EquipmentDataAccess {
         throw new UnsupportedOperationException(MESSAGE);
     }
 
-    @Override
-    public EquipmentResponseDTO updateEquipment(Integer characterId, UpdateEquipmentRequestDTO request) {
-        throw new UnsupportedOperationException(MESSAGE);
-    }
 }

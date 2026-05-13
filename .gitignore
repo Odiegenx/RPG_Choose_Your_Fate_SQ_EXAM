@@ -45,3 +45,4 @@ database_backups/*.sql
 .env
 **/.env
 
+.env.bak

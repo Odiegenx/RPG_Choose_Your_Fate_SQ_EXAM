@@ -60,4 +60,9 @@ public class QuestMigrationServiceMongo {
 
         log.info("Migrated {} quests", entities.size());
     }
+
+    public void dropCollection() {
+        log.info("dropping collection quests");
+        mongoRepo.deleteAll();
+    }
 }

@@ -21,6 +21,7 @@ public class RaceDetailsMigrationServiceMongo {
     private final IdMappingService idMappingService;
 
     public void migrate() {
+
         log.info("migrating race details");
 
         List<RaceDetails> entities = mysqlRepo.findAll();
@@ -34,5 +35,10 @@ public class RaceDetailsMigrationServiceMongo {
         }
 
         log.info("Migrated {} race detail entities", entities.size());
+    }
+
+    public void dropCollection() {
+        log.info("dropping collection race details");
+        mongoRepo.deleteAll();
     }
 }

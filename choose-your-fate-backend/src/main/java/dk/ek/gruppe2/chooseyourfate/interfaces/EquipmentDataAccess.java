@@ -10,6 +10,4 @@ public interface EquipmentDataAccess {
     List<EquipmentResponseDTO> getAllEquipment();
 
     EquipmentResponseDTO getEquipmentByCharacterId(Integer characterId);
-
-    EquipmentResponseDTO updateEquipment(Integer characterId, UpdateEquipmentRequestDTO request);
 }

@@ -1,5 +1,6 @@
 package dk.ek.gruppe2.chooseyourfate.dto;
 
+import dk.ek.gruppe2.chooseyourfate.enums.ItemType;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class ItemRequestDTO {
 
     private String name;
     private String description;
-    private String type;
+    private ItemType type;
 
     public Item getItemEntity() {
         Item item = new Item();

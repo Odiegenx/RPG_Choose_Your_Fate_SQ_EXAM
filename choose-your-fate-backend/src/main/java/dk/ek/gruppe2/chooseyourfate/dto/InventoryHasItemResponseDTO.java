@@ -1,6 +1,5 @@
 package dk.ek.gruppe2.chooseyourfate.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,10 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateEquipmentRequestDTO {
+public class InventoryHasItemResponseDTO {
 
-    private Integer itemId;
-    private String type;
-
-
+    private Integer inventoryId;
+    private Integer amount;
+    private ItemResponseDTO item;
 }

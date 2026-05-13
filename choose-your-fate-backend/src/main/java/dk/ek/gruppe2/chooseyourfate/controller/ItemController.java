@@ -2,7 +2,7 @@ package dk.ek.gruppe2.chooseyourfate.controller;
 
 import dk.ek.gruppe2.chooseyourfate.dto.ItemRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.ItemResponseDTO;
-import dk.ek.gruppe2.chooseyourfate.service.mysql.ItemService;
+import dk.ek.gruppe2.chooseyourfate.service.mysql.SqlItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +12,9 @@ import java.util.List;
 @RequestMapping("/choose-your-fate/items")
 public class ItemController {
 
-    ItemService itemService;
+    SqlItemService itemService;
 
-    public ItemController(ItemService itemService) {
+    public ItemController(SqlItemService itemService) {
         this.itemService = itemService;
     }
 
@@ -25,7 +25,7 @@ public class ItemController {
 
     @GetMapping("/{id}")
     public ItemResponseDTO getItemById(@PathVariable("id") Integer id) {
-        return itemService.getItemById(id);
+        return itemService.findById(id);
     }
 
     @PostMapping

@@ -37,13 +37,4 @@ public class EquipmentController {
         return equipmentService.getEquipmentByCharacterId(dataSource, characterId);
     }
 
-    @PutMapping("/{characterId}")
-    @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#characterId, authentication)")
-    public EquipmentResponseDTO updateEquipment(
-            @RequestHeader(value = DATA_SOURCE_HEADER, required = false) String dataSource,
-            @PathVariable Integer characterId,
-            @RequestBody UpdateEquipmentRequestDTO request
-    ) {
-        return equipmentService.updateEquipment(dataSource, characterId, request);
-    }
 }

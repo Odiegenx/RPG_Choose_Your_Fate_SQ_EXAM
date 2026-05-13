@@ -1,5 +1,6 @@
 package dk.ek.gruppe2.chooseyourfate.service.migration.mongodb;
 
+import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
 import dk.ek.gruppe2.chooseyourfate.model.mongodb.*;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.*;
 import dk.ek.gruppe2.chooseyourfate.repository.mongodb.CharacterAvatarRepositoryMongo;
@@ -128,7 +129,6 @@ public class CharacterAvatarMigrationServiceMongo {
 
     private CharacterPathMongo transformPath(Integer characterId) {
         CharacterPath path = characterPathRepository.findByCharacter_Id(characterId);
-
         List<ChoiceMadeMongo> choicesMade = characterPathChoiceRepository
                 .findByCharacterPath_Id(path.getId())
                 .stream()
@@ -157,5 +157,10 @@ public class CharacterAvatarMigrationServiceMongo {
                         .status(chq.getStatus() == (byte) 1)   // Byte → boolean   // TINYINT → boolean
                         .build())
                 .toList();
+    }
+
+    public void dropCollection() {
+        log.info("dropping collection characters");
+        mongoRepo.deleteAll();
     }
 }

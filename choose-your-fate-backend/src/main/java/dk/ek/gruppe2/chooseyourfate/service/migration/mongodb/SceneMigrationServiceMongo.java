@@ -146,4 +146,9 @@ public class SceneMigrationServiceMongo {
                 .itemIds(itemIds)
                 .build();
     }
+
+    public void dropCollection() {
+        log.info("dropping collection scenes");
+        mongoRepo.deleteAll();
+    }
 }

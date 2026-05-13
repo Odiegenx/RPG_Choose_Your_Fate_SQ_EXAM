@@ -16,15 +16,9 @@ public class MigrationController {
 
     private final MigrationRunner migrationRunner;
 
-    private boolean migrationAlreadyRun = false;
-
     @PostMapping("/run")
     public ResponseEntity<String> runMigration() {
-        if (migrationAlreadyRun) {
-            return ResponseEntity.badRequest().body("Migration has already been run!");
-        }
         migrationRunner.runAll();
-        migrationAlreadyRun = true;
         return ResponseEntity.ok("Migration complete!");
     }
 }

@@ -159,6 +159,9 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`character_path` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `character_id` INT NOT NULL,
   `summary` LONGTEXT NULL DEFAULT NULL,
+  `audio_blob` mediumblob,
+  `summary_updated_at` datetime DEFAULT NULL,
+  `audio_blob_updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `character_id_idx` (`character_id` ASC) VISIBLE,
   CONSTRAINT `fk_character_path_character`
@@ -180,7 +183,7 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`choice` (
   `target_id` INT NULL COMMENT 'Give quest, give item(s)... etc',
   `value_int` INT NULL COMMENT 'Stat change, lose hp, fashion!!!... etc\n\n\n\n\nze BOB race!',
   `story_weight` SMALLINT(255) NOT NULL COMMENT 'Value/weight of the recap or story telling for the AI to use.',
-  `requirements` JSON NULL COMMENT 'Requirements is what gives or takes away choices/ quests because you either meet the requirements or don\'t.',
+  `requirements` JSON NULL COMMENT 'Requirements is what gives or takes away choices/ quests because you either meet the requirements or dont',
   PRIMARY KEY (`id`),
   INDEX `scene_id_idx` (`scene_id` ASC) VISIBLE,
   INDEX `fk_choice_destination_scene_idx` (`destination_scene_id` ASC) VISIBLE,

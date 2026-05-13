@@ -2,8 +2,10 @@ package dk.ek.gruppe2.chooseyourfate.service.mysql;
 
 import dk.ek.gruppe2.chooseyourfate.dto.ItemRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.ItemResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.interfaces.ItemDataAccess;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Item;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.ItemRepository;
+import dk.ek.gruppe2.chooseyourfate.service.ItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,11 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
-public class ItemService {
+public class SqlItemService implements ItemDataAccess {
 
     ItemRepository itemRepository;
 
-    public ItemService(ItemRepository itemRepository) {
+    public SqlItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
     }
 
@@ -26,7 +28,7 @@ public class ItemService {
         return response;
     }
 
-    public ItemResponseDTO getItemById(Integer id) {
+    public ItemResponseDTO findById(Integer id) {
         Item item = itemRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
         ItemResponseDTO response = new ItemResponseDTO(item);
         return response;
@@ -52,5 +54,14 @@ public class ItemService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         itemRepository.deleteById(itemId);
+    }
+
+    public Item getItemEntity(Integer id) {
+        return itemRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public ItemResponseDTO toDto(Item item) {
+        return new ItemResponseDTO(item);
     }
 }

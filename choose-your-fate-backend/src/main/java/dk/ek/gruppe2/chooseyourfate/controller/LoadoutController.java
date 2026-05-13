@@ -1,0 +1,52 @@
+package dk.ek.gruppe2.chooseyourfate.controller;
+
+import dk.ek.gruppe2.chooseyourfate.dto.LoadoutResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
+import dk.ek.gruppe2.chooseyourfate.service.LoadoutService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/choose-your-fate/loadout")
+public class LoadoutController {
+
+    private static final String DATA_SOURCE_HEADER = "X-Data-Source";
+
+    private final LoadoutService loadoutService;
+
+    public LoadoutController(LoadoutService loadoutService) {
+        this.loadoutService = loadoutService;
+    }
+
+    @GetMapping("/{characterId}")
+    @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#characterId, authentication)")
+    public LoadoutResponseDTO getLoadout(
+            @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
+            @PathVariable Integer characterId)
+    {
+        return loadoutService.getLoadoutByCharacterId(dataSource, characterId);
+    }
+
+    @GetMapping("/{characterId}/unequip/{itemId}")
+    @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#characterId, authentication)")
+    public LoadoutResponseDTO unequipItem(
+            @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
+            @PathVariable Integer characterId,
+            @PathVariable Integer itemId
+    ) {
+        return loadoutService.unequipItem(dataSource, characterId, itemId);
+    }
+
+    @GetMapping("/{characterId}/equip/{itemId}")
+    @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#characterId, authentication)")
+    public LoadoutResponseDTO equipItem(
+            @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
+            @PathVariable Integer characterId,
+            @PathVariable Integer itemId
+    ) {
+        return loadoutService.equipItem(dataSource, characterId, itemId);
+    }
+
+
+
+}
