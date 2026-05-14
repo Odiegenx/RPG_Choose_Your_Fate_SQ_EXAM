@@ -31,12 +31,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         Account acc = repo.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("SQL Not found"));
 
-        System.out.println("SQL: " + acc.toString());
-
         AccountDocumentMongo accMongo = repoMongo.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("Mongodb Not found"));
-
-        System.out.println("Mongo: " + accMongo.toString());
 
         // Optional<AccountNode> accNeo = repoNeo4J.findByUsername(username);
         //     // .orElseThrow(() ->{ 
