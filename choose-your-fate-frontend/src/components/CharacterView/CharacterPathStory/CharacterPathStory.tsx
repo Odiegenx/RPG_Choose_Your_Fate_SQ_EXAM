@@ -35,7 +35,7 @@ export default function CharacterPathStory({ character }: Props) {
 
   const handleStartGame = async () => {
     try {
-      navigate("/Game");
+      navigate("/game");
     } catch (err) {
       console.error(err);
       alert("Login failed");
