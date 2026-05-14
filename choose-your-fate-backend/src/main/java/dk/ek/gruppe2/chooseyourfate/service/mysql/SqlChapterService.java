@@ -52,9 +52,13 @@ public class SqlChapterService implements ChapterDataAccess {
         chapter.setName(request.getName());
         chapter.setScenes(request.getScenes());
         chapter.setCharacters(request.getCharacters());
-        chapter.setStartingScene(sceneRepository.findById(request.getStartingSceneId())
-            .orElseThrow(() -> new ResourceNotFoundException("Scene not found with id: " + request.getStartingSceneId())));
-        
+        if (request.getStartingSceneId() == null) {
+            chapter.setStartingScene(null);
+        } else {
+            chapter.setStartingScene(sceneRepository.findById(request.getStartingSceneId())
+                .orElseThrow(() -> new ResourceNotFoundException("Scene not found with id: " + request.getStartingSceneId())));
+        }
+
         return new ChapterResponseDTO(chapterRepository.save(chapter));
     }
 
