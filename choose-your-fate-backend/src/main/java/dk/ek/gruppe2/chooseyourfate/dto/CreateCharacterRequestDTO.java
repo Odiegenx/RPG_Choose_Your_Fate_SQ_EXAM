@@ -1,15 +1,15 @@
 package dk.ek.gruppe2.chooseyourfate.dto;
 
-import groovyjarjarantlr4.v4.runtime.misc.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public class CreateCharacterRequestDTO {
-    @NotNull
+    @NotNull(message = "accountId is required")
     private Integer accountId;
 
     private Integer chapterId;
     private Integer sceneId;
     
-    @NotNull
+    @NotNull(message = "race details id is required")
     private Integer raceDetailsId;
     private String name;
 

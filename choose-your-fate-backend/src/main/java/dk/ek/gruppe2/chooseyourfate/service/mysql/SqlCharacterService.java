@@ -58,8 +58,6 @@ public class SqlCharacterService implements CharacterDataAccess<Integer> {
 
     @Override
     public CharacterResponseDTO createCharacter(CreateCharacterRequestDTO request) {
-
-
         if (request.getChapterId() == null || request.getSceneId() == null) {
             RaceDetails raaceDetails = raceDetailsRepository.findById(request.getRaceDetailsId())
             .orElseThrow(() -> new ResourceNotFoundException("Character not found with id: " +request.getRaceDetailsId()));
