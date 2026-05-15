@@ -1,17 +1,59 @@
 package dk.ek.gruppe2.chooseyourfate.repository.neo4j;
 
-import dk.ek.gruppe2.chooseyourfate.model.neo4j.AccountNode;
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import org.springframework.data.neo4j.repository.query.Query;
-
+import java.util.List;
 import java.util.Optional;
 
-public interface AccountNodeRepository extends Neo4jRepository<AccountNode, Integer> {
+public interface AccountNodeRepository {
 
-    Optional<AccountNode> findByUsername(String username);
+    List<AccountData> findAllAccountData();
 
-    Optional<AccountNode> findByEmail(String email);
+    Optional<AccountData> findAccountDataById(Integer id);
 
-    @Query("MATCH (a:Account) RETURN coalesce(max(a.id), 0) + 1")
-    Integer findNextId();
+    Optional<AccountSnapshot> findAccountSnapshotById(Integer id);
+
+    Optional<Integer> findAccountIdByUsername(String username);
+
+    Optional<Integer> findAccountIdByEmail(String email);
+
+    Optional<AccountData> createAccount(CreateAccountData toCreate);
+
+    Optional<AccountData> updateAccount(UpdateAccountData toUpdate);
+
+    int deleteAccountById(Integer id);
+
+    record AccountData(
+            Integer id,
+            String username,
+            Integer characterLimit,
+            String email
+    ) {
+    }
+
+    record CreateAccountData(
+            String username,
+            String email,
+            Integer characterLimit,
+            String password,
+            String role
+    ) {
+    }
+
+    record UpdateAccountData(
+            Integer id,
+            String username,
+            String email,
+            Integer characterLimit,
+            String password
+    ) {
+    }
+
+    record AccountSnapshot(
+            Integer id,
+            String username,
+            Integer characterLimit,
+            String email,
+            String password,
+            String role
+    ) {
+    }
 }

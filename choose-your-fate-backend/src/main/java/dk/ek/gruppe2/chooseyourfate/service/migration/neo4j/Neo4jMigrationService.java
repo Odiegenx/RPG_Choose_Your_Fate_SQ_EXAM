@@ -115,6 +115,7 @@ public class Neo4jMigrationService {
                     tx.run("MATCH (n) DETACH DELETE n").consume();
                 }
                 migrateNodes(tx, accounts, chapters, scenes, choices, quests, items, npcs, raceDetails, characters, characterPaths, inventories);
+                syncAccountCounter(tx);
                 migrateCharacterDetails(tx, characterDetails);
                 migrateRelationships(tx, characterQuests, characterPathChoices, choiceItems, equipment, inventoryItems, questItems, sceneNpcs);
                 return null;
@@ -181,7 +182,10 @@ public class Neo4jMigrationService {
     }
 
     private void createConstraints(Session session) {
+        session.run("CREATE CONSTRAINT counter_name_unique IF NOT EXISTS FOR (c:Counter) REQUIRE c.name IS UNIQUE").consume();
         session.run("CREATE CONSTRAINT account_id IF NOT EXISTS FOR (n:Account) REQUIRE n.id IS UNIQUE").consume();
+        session.run("CREATE CONSTRAINT account_username_unique IF NOT EXISTS FOR (n:Account) REQUIRE n.username IS UNIQUE").consume();
+        session.run("CREATE CONSTRAINT account_email_unique IF NOT EXISTS FOR (n:Account) REQUIRE n.email IS UNIQUE").consume();
         session.run("CREATE CONSTRAINT chapter_id IF NOT EXISTS FOR (n:Chapter) REQUIRE n.id IS UNIQUE").consume();
         session.run("CREATE CONSTRAINT scene_id IF NOT EXISTS FOR (n:Scene) REQUIRE n.id IS UNIQUE").consume();
         session.run("CREATE CONSTRAINT choice_id IF NOT EXISTS FOR (n:Choice) REQUIRE n.id IS UNIQUE").consume();
@@ -192,6 +196,15 @@ public class Neo4jMigrationService {
         session.run("CREATE CONSTRAINT character_id IF NOT EXISTS FOR (n:Character) REQUIRE n.id IS UNIQUE").consume();
         session.run("CREATE CONSTRAINT character_path_id IF NOT EXISTS FOR (n:CharacterPath) REQUIRE n.id IS UNIQUE").consume();
         session.run("CREATE CONSTRAINT inventory_id IF NOT EXISTS FOR (n:Inventory) REQUIRE n.id IS UNIQUE").consume();
+    }
+
+    private void syncAccountCounter(TransactionContext tx) {
+        tx.run("""
+                MATCH (a:Account)
+                WITH coalesce(max(a.id), 0) AS maxAccountId
+                MERGE (counter:Counter {name: 'account'})
+                SET counter.value = maxAccountId
+                """).consume();
     }
 
     private void migrateNodes(
