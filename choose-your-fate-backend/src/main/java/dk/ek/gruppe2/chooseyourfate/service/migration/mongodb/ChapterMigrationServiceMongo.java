@@ -41,4 +41,32 @@ public class ChapterMigrationServiceMongo {
 
         log.info("Migrated {} chapters", entities.size());
     }
+
+    // SECOND PASS — resolve StartingSceneId
+    // All scenes now exist in MongoDB so we can resolve all references
+    public void migrateSecondPass() {
+        log.info("Starting Scene migration (second pass)...");
+
+        List<Chapter> entities = mysqlRepo.findAll();
+
+        for (Chapter entity : entities) {
+
+            // fetch the chapter document we saved in first pass
+            String mongoChapterId = idMappingService.get(CollectionNames.CHAPTERS, entity.getId());
+            ChapterDocumentMongo doc = mongoRepo.findById(mongoChapterId).orElseThrow();
+
+            if (entity.getStartingScene() != null) {
+                doc.setStartingSceneId(idMappingService.get(
+                        CollectionNames.SCENES,
+                        entity.getStartingScene().getId()
+                ));
+            } else {
+                doc.setStartingSceneId(null);
+            }
+
+            mongoRepo.save(doc);
+        }
+
+        log.info("Updated {} scenes (second pass)", entities.size());
+    }
 }

@@ -107,6 +107,7 @@ public class Neo4jMigrationService {
 
         try (Session session = neo4jDriver.session()) {
             createConstraints(session);
+            createIndexes(session);
         }
 
         try (Session session = neo4jDriver.session()) {
@@ -198,6 +199,26 @@ public class Neo4jMigrationService {
         session.run("CREATE CONSTRAINT inventory_id IF NOT EXISTS FOR (n:Inventory) REQUIRE n.id IS UNIQUE").consume();
     }
 
+    private void createIndexes(Session session) {
+        session.run("""
+                CREATE INDEX item_type_index IF NOT EXISTS
+                FOR (i:Item)
+                ON (i.type)
+        """).consume();
+
+        session.run("""
+                CREATE INDEX race_details_starting_chapter_id_index IF NOT EXISTS
+                FOR (r:RaceDetails)
+                ON (r.starting_chapter_id)
+        """).consume();
+
+        session.run("""
+                CREATE INDEX chapter_starting_scene_id_index IF NOT EXISTS
+                FOR (c:Chapter)
+                ON (c.starting_scene_id)
+        """).consume();
+    }
+
     private void syncAccountCounter(TransactionContext tx) {
         tx.run("""
                 MATCH (a:Account)
@@ -239,8 +260,12 @@ public class Neo4jMigrationService {
 
         for (Chapter chapter : chapters) {
             tx.run(
-                    "MERGE (c:Chapter {id: $id}) SET c.name = $name",
-                    params("id", chapter.getId(), "name", chapter.getName())
+                    "MERGE (c:Chapter {id: $id}) SET c.name = $name, c.starting_scene_id = $starting_scene_id",
+                    params(
+                            "id", chapter.getId(),
+                            "name", chapter.getName(),
+                            "starting_scene_id", chapter.getStartingScene() == null ? null : chapter.getStartingScene().getId()
+                    )
             ).consume();
         }
 
@@ -306,7 +331,7 @@ public class Neo4jMigrationService {
         }
 
         for (RaceDetails detail : raceDetails) {
-            tx.run("MERGE (r:RaceDetails {id: $id}) SET r.name = $name", params("id", detail.getId(), "name", detail.getName())).consume();
+            tx.run("MERGE (r:RaceDetails {id: $id}) SET r.name = $name, r.starting_chapter_id = $starting_chapter_id", params("id", detail.getId(), "name", detail.getName(), "starting_chapter_id", detail.getStartingChapter().getId())).consume();
         }
 
         for (Npc npc : npcs) {
