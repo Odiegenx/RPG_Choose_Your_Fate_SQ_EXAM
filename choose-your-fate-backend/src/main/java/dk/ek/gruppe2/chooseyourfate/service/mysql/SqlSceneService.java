@@ -1,5 +1,6 @@
 package dk.ek.gruppe2.chooseyourfate.service.mysql;
 
+import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneLookaheadResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneResponseDTO;
 
 import java.util.List;
@@ -68,5 +69,10 @@ public class SqlSceneService implements SceneDataAccess {
     private Chapter getChapterById(Integer chapterId){
         return chapterRepository.findById(chapterId)
             .orElseThrow(() -> new ResourceNotFoundException("Chapter not found with id: " + chapterId));
+    }
+
+    @Override
+    public SceneLookaheadResponseDTO getSceneLookahead(Integer id) {
+        throw new UnsupportedOperationException("Scene lookahead is not implemented for SQL");
     }
 }

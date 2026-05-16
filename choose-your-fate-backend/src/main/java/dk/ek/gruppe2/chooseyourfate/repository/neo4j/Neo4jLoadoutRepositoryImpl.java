@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
@@ -26,7 +27,7 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
     // Inventory skal altid findes, men det må gerne være tomt.
     @Override
     public LoadoutResponseDTO getLoadoutByCharacterId(Integer characterId) {
-        Integer inventoryId = findInventoryId(characterId); // Finder inventory noden for at sikre os den eksiterer
+        Integer inventoryId = findInventoryId(characterId);
         List<InventoryItemData> inventoryItemData = findInventoryItems(characterId);
 
         List<InventoryHasItemResponseDTO> itemsInInventory = inventoryItemData.stream()
@@ -35,25 +36,20 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                 .toList();
         List<ItemResponseDTO> equippedItems = new ArrayList<>();
 
-        EquippedItemData headItem = findEquippedItem(characterId, EquipmentSlotRelation.HEAD);
-        EquippedItemData chestItem = findEquippedItem(characterId, EquipmentSlotRelation.CHEST);
-        EquippedItemData legsItem = findEquippedItem(characterId, EquipmentSlotRelation.LEGS);
+        findEquippedItem(characterId, ItemType.ARMOR_HEAD)
+                .ifPresent(itemData -> equippedItems.add(toItemResponseDTO(itemData)));
+        findEquippedItem(characterId, ItemType.ARMOR_CHEST)
+                .ifPresent(itemData -> equippedItems.add(toItemResponseDTO(itemData)));
+        findEquippedItem(characterId, ItemType.ARMOR_LEGS)
+                .ifPresent(itemData -> equippedItems.add(toItemResponseDTO(itemData)));
 
-        if (headItem != null) {
-            equippedItems.add(toItemResponseDTO(headItem));
-        }
-        if (chestItem != null) {
-            equippedItems.add(toItemResponseDTO(chestItem));
-        }
-        if (legsItem != null) {
-            equippedItems.add(toItemResponseDTO(legsItem));
-        }
         return new LoadoutResponseDTO(inventoryId, equippedItems, itemsInInventory);
     }
+
     // Finder alle items i characterens inventory sammen med amount på CONTAINS-relationen.
     // Hvis inventoryen er tom, returneres stadig inventoryen, men uden item-data.
-    private List<InventoryItemData> findInventoryItems(Integer charaterId){
-        return new ArrayList<>(neo4jClient.query("""
+    private List<InventoryItemData> findInventoryItems(Integer characterId) {
+        return neo4jClient.query("""
                         MATCH (:Character {id: $characterId})-[:HAS_INVENTORY]->(inv:Inventory)
                         OPTIONAL MATCH (inv)-[r:CONTAINS]->(item:Item)
                         RETURN inv.id AS inventoryId,
@@ -63,9 +59,10 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                                item.type AS type,
                                r.amount AS amount
                         ORDER BY item.id
-                        """).bind(charaterId).to("characterId")
+                        """)
+                .bind(characterId).to("characterId")
                 .fetchAs(InventoryItemData.class)
-                .mappedBy(((typeSystem, itemRecord) -> {
+                .mappedBy((typeSystem, itemRecord) -> {
                     if (itemRecord.get("itemId").isNull()) {
                         return new InventoryItemData(
                                 itemRecord.get("inventoryId").asInt(),
@@ -74,9 +71,9 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                                 null,
                                 null,
                                 null
-
                         );
                     }
+
                     return new InventoryItemData(
                             itemRecord.get("inventoryId").asInt(),
                             itemRecord.get("itemId").asInt(),
@@ -85,33 +82,40 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                             ItemType.valueOf(itemRecord.get("type").asString().toUpperCase()),
                             itemRecord.get("amount").asInt()
                     );
-                })).all().stream().toList());
+                })
+                .all()
+                .stream()
+                .toList();
     }
-    // Finder inventory-noden for den angivne character.
-    // Inventory er en obligatorisk del af modellen, så der kastes fejl hvis den ikke findes.
-    private EquippedItemData findEquippedItem(Integer characterId, EquipmentSlotRelation relationType) {
+
+    @Override
+    public Optional<ItemData> findEquippedItem(Integer characterId, ItemType itemType) {
+        EquipmentSlotRelation relationType = resolveEquipmentRelation(itemType);
+
         String query = """
-            MATCH (c:Character {id: $characterId})-[r:%s]->(item:Item)
-            RETURN item.id AS itemId,
-                   item.name AS name,
-                   item.description AS description,
-                   item.type AS type
-            """.formatted(relationType.relationshipType());
+                MATCH (c:Character {id: $characterId})-[r:%s]->(item:Item)
+                RETURN item.id AS itemId,
+                       item.name AS name,
+                       item.description AS description,
+                       item.type AS type
+                """.formatted(relationType.relationshipType());
+
         return neo4jClient.query(query)
                 .bind(characterId).to("characterId")
-                .fetchAs(EquippedItemData.class)
-                .mappedBy((typeSystem, itemRecord) -> new EquippedItemData(
+                .fetchAs(ItemData.class)
+                .mappedBy((typeSystem, itemRecord) -> new ItemData(
                         itemRecord.get("itemId").asInt(),
                         itemRecord.get("name").asString(),
                         itemRecord.get("description").asString(),
                         ItemType.valueOf(itemRecord.get("type").asString().toUpperCase())
                 ))
-                .one()
-                .orElse(null);
+                .one();
     }
+
     // Finder inventory-noden for den angivne character.
     // Inventory er en obligatorisk del af modellen, så der kastes fejl hvis den ikke findes.
-    private Integer findInventoryId(Integer characterId) {
+    @Override
+    public Integer findInventoryId(Integer characterId) {
         return neo4jClient.query("""
                     MATCH (:Character {id: $characterId})-[:HAS_INVENTORY]->(inventory:Inventory)
                     RETURN inventory.id AS inventoryId
@@ -125,67 +129,6 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                         HttpStatus.NOT_FOUND,
                         "Inventory not found for character id: " + characterId
                 ));
-    }
-    // Finder inventory og itemet der skal equipes.
-    // Bruger itemets type til at afgøre hvilken equipped-relation der skal bruges.
-    // Tjekker at itemet faktisk findes i inventory, og finder eventuelt det item der allerede sidder i slotten.
-    // Det nye item fjernes fra inventory, det gamle lægges tilbage hvis nødvendigt, og equipped-relationen opdateres.
-    // Til sidst returneres den opdaterede loadout.
-    @Override
-    public LoadoutResponseDTO equipItem(Integer characterId, Integer itemId) {
-        Integer inventoryId = findInventoryId(characterId);
-        EquippedItemData itemToEquip = findItemById(itemId);
-        EquipmentSlotRelation relationshipType = resolveEquipmentRelation(itemToEquip.type());
-        Integer amountInInventory = findInventoryItemAmount(inventoryId, itemToEquip.itemId());
-        if (amountInInventory < 1) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Item is not present in inventory"
-            );
-        }
-        EquippedItemData currentlyEquippedItem = findEquippedItem(characterId, relationshipType);
-        decrementInventoryItem(inventoryId, itemToEquip.itemId());
-        if(currentlyEquippedItem != null) {
-            incrementInventoryItem(inventoryId,currentlyEquippedItem.itemId());
-        }
-        setEquippedItem(characterId, itemToEquip.itemId(), relationshipType);
-        return getLoadoutByCharacterId(characterId);
-    }
-    // Finder characterens inventory og det item der skal unequippes.
-    // Bruger itemets type til at afgøre hvilken equipped-relation der skal findes og fjernes.
-    // Tjekker derefter at det konkrete item faktisk er equipped i den forventede slot.
-    // Hvis det passer, lægges itemet tilbage i inventory ved enten at øge amount eller oprette en ny relation.
-    // Til sidst fjernes equipped-relationen, og den opdaterede loadout returneres.
-    @Override
-    public LoadoutResponseDTO unequipItem(Integer characterId, Integer itemId) {
-        Integer inventoryId = findInventoryId(characterId);
-        EquippedItemData itemToUnequip = findItemById(itemId);
-        EquipmentSlotRelation relationshipType = resolveEquipmentRelation(itemToUnequip.type());
-
-        EquippedItemData currentlyEquippedItem = findEquippedItem(characterId, relationshipType);
-        if (currentlyEquippedItem == null || !currentlyEquippedItem.itemId().equals(itemToUnequip.itemId())) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Item is not currently equipped"
-            );
-        }
-        incrementInventoryItem(inventoryId, itemToUnequip.itemId());
-        removeEquippedItem(characterId, relationshipType);
-        return getLoadoutByCharacterId(characterId);
-    }
-
-    // Fjerner equipped-relationen i den angivne slot for characteren.
-    // Bruges ved unequip efter vi har verificeret at det rigtige item faktisk sidder der.
-    private void removeEquippedItem(Integer characterId, EquipmentSlotRelation slotRelation) {
-        String relationshipType = slotRelation.relationshipType();
-
-        String query = """
-            MATCH (character:Character {id: $characterId})-[relation:%s]->(:Item)
-            DELETE relation
-            """.formatted(relationshipType);
-        neo4jClient.query(query)
-                .bind(characterId).to("characterId")
-                .run();
     }
 
     // Oversætter itemets type til den slot-specifikke relationstype der bruges i Neo4j.
@@ -201,10 +144,11 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
             );
         };
     }
+
     // Har characterens inventory det her item, og hvor mange er der.
-    // Vi returner 0 hvis item'et ikke er i inventory
-    // (betyder er ikke er nogen relation mellem det item og characters inventory.)
-    private Integer findInventoryItemAmount(Integer inventoryId, Integer itemId) {
+    // Vi returnerer 0 hvis itemet ikke er i inventory.
+    @Override
+    public Integer findInventoryItemAmount(Integer inventoryId, Integer itemId) {
         return neo4jClient.query("""
                     MATCH (inventory:Inventory {id: $inventoryId})-[relation:CONTAINS]->(item:Item {id: $itemId})
                     RETURN relation.amount AS amount
@@ -216,9 +160,11 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                 .one()
                 .orElse(0);
     }
+
     // Finder et item ud fra id og mapper det til intern read-model.
     // Bruges som validering, så vi ikke arbejder videre med et item der ikke findes.
-    private EquippedItemData findItemById(Integer itemId) {
+    @Override
+    public ItemData findItemById(Integer itemId) {
         return neo4jClient.query("""
                     MATCH (item:Item {id: $itemId})
                     RETURN item.id AS itemId,
@@ -227,8 +173,8 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                            item.type AS type
                     """)
                 .bind(itemId).to("itemId")
-                .fetchAs(EquippedItemData.class)
-                .mappedBy((typeSystem, itemRecord) -> new EquippedItemData(
+                .fetchAs(ItemData.class)
+                .mappedBy((typeSystem, itemRecord) -> new ItemData(
                         itemRecord.get("itemId").asInt(),
                         itemRecord.get("name").asString(),
                         itemRecord.get("description").asString(),
@@ -240,9 +186,11 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                         "Item not found with id: " + itemId
                 ));
     }
-    // reducerer amount på relationen mellem inventory og account med 1
-    // og i tilfælde af at current amount er 1 bliver relationen slettet.
-    private void decrementInventoryItem(Integer inventoryId, Integer itemId) {
+
+    // Reducerer amount på relationen mellem inventory og item med 1.
+    // Hvis amount er 1, bliver relationen slettet.
+    @Override
+    public void decrementInventoryItem(Integer inventoryId, Integer itemId) {
         neo4jClient.query("""
                     MATCH (:Inventory {id: $inventoryId})-[relation:CONTAINS]->(:Item {id: $itemId})
                     WITH relation, relation.amount AS oldAmount
@@ -256,33 +204,12 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                 .bind(inventoryId).to("inventoryId")
                 .bind(itemId).to("itemId")
                 .run();
-
-//        Har fundet en smartere måde at gøre det på.
-//        neo4jClient.query("""
-//                    MATCH (inventory:Inventory {id: $inventoryId})-[relation:CONTAINS]->(item:Item {id: $itemId})
-//                    WITH relation
-//                    WHERE relation.amount > 1
-//                    SET relation.amount = relation.amount - 1
-//                    """)
-//                .bind(inventoryId).to("inventoryId")
-//                .bind(itemId).to("itemId")
-//                .run();
-//
-//        neo4jClient.query("""
-//                    MATCH (inventory:Inventory {id: $inventoryId})-[relation:CONTAINS]->(item:Item {id: $itemId})
-//                    WITH relation
-//                    WHERE relation.amount = 1
-//                    DELETE relation
-//                    """)
-//                .bind(inventoryId).to("inventoryId")
-//                .bind(itemId).to("itemId")
-//                .run();
     }
-    // Tjekket om en item allerede er i inventory og ligger en til hvis det er,
-    // ellers oprettes en relation med amount = 1
-    // merge for at sikre at hvis relationen allerede eksistere addeder den eller
-    // ellers starter den på 1.
-    private void incrementInventoryItem(Integer inventoryId, Integer itemId) {
+
+    // Tjekker om et item allerede er i inventory og lægger en til hvis det er,
+    // ellers oprettes en relation med amount = 1.
+    @Override
+    public void incrementInventoryItem(Integer inventoryId, Integer itemId) {
         neo4jClient.query("""
                     MATCH (inventory:Inventory {id: $inventoryId})
                     MATCH (item:Item {id: $itemId})
@@ -295,31 +222,45 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                 .run();
     }
 
-    // Finder characteren, finder den nye item som skal equippes
-    // Finder den gamle relation (hvis den eksitere) og sletter den
-    // opretter ny relation.
-    private void setEquippedItem(Integer characterId, Integer itemToEquipId, EquipmentSlotRelation slotRelation) {
+    // Finder characteren og itemet der skal equips.
+    // Fjerner eksisterende relation i den relevante slot og opretter derefter den nye.
+    @Override
+    public void setEquippedItem(Integer characterId, Integer itemId, ItemType itemType) {
+        EquipmentSlotRelation slotRelation = resolveEquipmentRelation(itemType);
         String relationshipType = slotRelation.relationshipType();
 
         String query = """
-            MATCH (character:Character {id: $characterId})
-            MATCH (item:Item {id: $itemId})
-            OPTIONAL MATCH (character)-[oldRelation:%s]->(:Item)
-            DELETE oldRelation
-            CREATE (character)-[:%s]->(item)
-            """.formatted(relationshipType, relationshipType);
+                MATCH (character:Character {id: $characterId})
+                MATCH (item:Item {id: $itemId})
+                OPTIONAL MATCH (character)-[oldRelation:%s]->(:Item)
+                DELETE oldRelation
+                CREATE (character)-[:%s]->(item)
+                """.formatted(relationshipType, relationshipType);
 
         neo4jClient.query(query)
                 .bind(characterId).to("characterId")
-                .bind(itemToEquipId).to("itemId")
+                .bind(itemId).to("itemId")
                 .run();
     }
-    // Mapper intern item-data til response DTO for loadoutens equipped items.
-    private ItemResponseDTO toItemResponseDTO(EquippedItemData itemData) {
-        if (itemData == null) {
-            return null;
-        }
 
+    // Fjerner equipped-relationen i den angivne slot for characteren.
+    @Override
+    public void removeEquippedItem(Integer characterId, ItemType itemType) {
+        EquipmentSlotRelation slotRelation = resolveEquipmentRelation(itemType);
+        String relationshipType = slotRelation.relationshipType();
+
+        String query = """
+                MATCH (character:Character {id: $characterId})-[relation:%s]->(:Item)
+                DELETE relation
+                """.formatted(relationshipType);
+
+        neo4jClient.query(query)
+                .bind(characterId).to("characterId")
+                .run();
+    }
+
+    // Mapper intern item-data til response DTO for loadoutens equipped items.
+    private ItemResponseDTO toItemResponseDTO(ItemData itemData) {
         return new ItemResponseDTO(
                 itemData.itemId(),
                 itemData.name(),
@@ -327,6 +268,7 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                 itemData.type()
         );
     }
+
     // Mapper intern inventory item-data til response DTO med amount og indlejret item.
     private InventoryHasItemResponseDTO toInventoryHasItemResponseDTO(InventoryItemData itemData) {
         return new InventoryHasItemResponseDTO(
@@ -340,16 +282,29 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                 )
         );
     }
+
     private enum EquipmentSlotRelation {
         CHEST("EQUIPPED_CHEST"),
         HEAD("EQUIPPED_HEAD"),
         LEGS("EQUIPPED_LEGS");
+
         private final String relationshipType;
-        EquipmentSlotRelation(String r) { this.relationshipType = r; }
+
+        EquipmentSlotRelation(String relationshipType) {
+            this.relationshipType = relationshipType;
+        }
+
         public String relationshipType() {
             return relationshipType;
         }
     }
-    private record EquippedItemData(Integer itemId, String name, String description, ItemType type) {}
-    private record InventoryItemData(Integer inventoryId,Integer itemId, String name,String description,ItemType type, Integer amount) {}
+
+    private record InventoryItemData(
+            Integer inventoryId,
+            Integer itemId,
+            String name,
+            String description,
+            ItemType type,
+            Integer amount
+    ) {}
 }
