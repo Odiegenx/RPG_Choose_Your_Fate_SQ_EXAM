@@ -261,7 +261,11 @@ public class Neo4jMigrationService {
         for (Chapter chapter : chapters) {
             tx.run(
                     "MERGE (c:Chapter {id: $id}) SET c.name = $name, c.starting_scene_id = $starting_scene_id",
-                    params("id", chapter.getId(), "name", chapter.getName(), "starting_scene_id", chapter.getStartingScene().getId())
+                    params(
+                            "id", chapter.getId(),
+                            "name", chapter.getName(),
+                            "starting_scene_id", chapter.getStartingScene() == null ? null : chapter.getStartingScene().getId()
+                    )
             ).consume();
         }
 
