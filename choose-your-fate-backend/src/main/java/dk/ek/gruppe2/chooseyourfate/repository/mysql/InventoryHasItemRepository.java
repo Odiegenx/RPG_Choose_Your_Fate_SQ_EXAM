@@ -10,7 +10,5 @@ public interface InventoryHasItemRepository extends JpaRepository<InventoryHasIt
     List<InventoryHasItem> findByInventory_Id(Integer inventoryId);
     List<InventoryHasItem> findByItem_Id(Integer itemId);
 
-    void deleteByInventoryIdAndItemId(Integer inventoryId, Integer itemId);
-
     boolean existsByInventoryIdAndItemId(Integer inventoryId, Integer itemId);
 }

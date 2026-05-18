@@ -18,7 +18,7 @@ public class LoadoutService {
 
     public LoadoutService(
             SqlLoadoutService sqlLoadoutService
-            //Neo4jLoadoutervice neo4jLoadoutService,
+            //Neo4jLoadoutService neo4jLoadoutService,
             //MongoLoadoutService mongoLoadoutService
     ) {
         this.sqlLoadoutService = sqlLoadoutService;
