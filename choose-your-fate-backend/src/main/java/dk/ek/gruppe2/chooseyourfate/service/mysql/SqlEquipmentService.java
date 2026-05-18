@@ -21,14 +21,10 @@ public class SqlEquipmentService implements EquipmentDataAccess {
 
     private final EquipmentRepository equipmentRepository;
     private final SqlItemService itemService;
-    private final SqlInventoryService inventoryService;
-    private final InventoryHasItemRepository inventoryHasItemRepository;
 
     public SqlEquipmentService(EquipmentRepository equipmentRepository, SqlItemService itemService, SqlInventoryService inventoryService, InventoryHasItemRepository inventoryHasItemRepository) {
         this.equipmentRepository = equipmentRepository;
         this.itemService = itemService;
-        this.inventoryService = inventoryService;
-        this.inventoryHasItemRepository = inventoryHasItemRepository;
     }
 
     @Override
