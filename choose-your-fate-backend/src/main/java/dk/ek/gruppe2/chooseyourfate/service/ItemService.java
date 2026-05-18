@@ -2,7 +2,6 @@ package dk.ek.gruppe2.chooseyourfate.service;
 
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.interfaces.ItemDataAccess;
-import dk.ek.gruppe2.chooseyourfate.interfaces.ItemDataAccess;
 import dk.ek.gruppe2.chooseyourfate.service.mysql.SqlItemService;
 import org.springframework.stereotype.Service;
 
