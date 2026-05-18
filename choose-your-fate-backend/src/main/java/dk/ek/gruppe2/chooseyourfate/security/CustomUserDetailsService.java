@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
+import dk.ek.gruppe2.chooseyourfate.dto.AccountResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.model.mongodb.AccountDocumentMongo;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Account;
@@ -12,6 +13,8 @@ import dk.ek.gruppe2.chooseyourfate.model.neo4j.AccountNode;
 import dk.ek.gruppe2.chooseyourfate.repository.mongodb.AccountRepositoryMongo;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.AccountRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.neo4j.AccountNodeRepository;
+import dk.ek.gruppe2.chooseyourfate.repository.neo4j.AccountNodeRepository.AccountData;
+import dk.ek.gruppe2.chooseyourfate.repository.neo4j.AccountNodeRepository.AccountSnapshot;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -33,13 +36,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         AccountDocumentMongo accMongo = repoMongo.findByUsername(username).orElse(null);
 
-        // Optional<AccountNode> accNeo = repoNeo4J.findByUsername(username);
-        //     // .orElseThrow(() ->{ 
-
-        //     //     return new UsernameNotFoundException("Neo4J Not found");});
+        AccountSnapshot accNeo = repoNeo4J.findAccountSnapshotByUsername(username).orElse(null);
         
-        // System.out.println("Neo: " + accNeo.toString());
-
-        return new CustomUserDetails(acc, accMongo);
+        return new CustomUserDetails(acc, accMongo, accNeo);
     }
 }
