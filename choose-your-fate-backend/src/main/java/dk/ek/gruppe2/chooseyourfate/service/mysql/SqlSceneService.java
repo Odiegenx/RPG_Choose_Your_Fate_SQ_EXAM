@@ -1,5 +1,6 @@
 package dk.ek.gruppe2.chooseyourfate.service.mysql;
 
+import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneLookaheadResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneResponseDTO;
 
 import java.util.List;
@@ -26,16 +27,18 @@ public class SqlSceneService implements SceneDataAccess {
     }
 
     @Override
+    // Returns all SQL scenes with one-scene lookahead choices included.
     public List<SceneResponseDTO> getAllScenes() {
-        return sceneRepository.findAll()
+        return sceneRepository.findAllWithLookAhead()
                 .stream()
                 .map(SceneResponseDTO::new)
                 .toList();
     }
 
     @Override
-    public SceneResponseDTO getSceneById(Integer id) {
-        return new SceneResponseDTO(getSceneEntity(id));
+    // Returns one SQL scene with the choices and destination scenes already loaded.
+    public SceneLookaheadResponseDTO getSceneById(Integer id) {
+        return new SceneLookaheadResponseDTO(getSceneEntity(id));
     }
 
     @Override
@@ -61,7 +64,7 @@ public class SqlSceneService implements SceneDataAccess {
     }
 
     private Scene getSceneEntity(Integer id) {
-        return sceneRepository.findById(id)
+        return sceneRepository.findByIdWithLookAhead(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Scene not found with id: " + id));
     }
 

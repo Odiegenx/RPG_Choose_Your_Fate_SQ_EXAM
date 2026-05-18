@@ -2,6 +2,7 @@ package dk.ek.gruppe2.chooseyourfate.service;
 
 import java.util.List;
 
+import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneLookaheadResponseDTO;
 import org.springframework.stereotype.Service;
 
 import dk.ek.gruppe2.chooseyourfate.dto.scene.CreateSceneRequestDTO;
@@ -31,7 +32,12 @@ public class SceneService {
         return resolveDataService(source).getAllScenes();
     }
 
-    public SceneResponseDTO getSceneById(DataSourceType source, Integer id) {
+    public SceneLookaheadResponseDTO getSceneById(DataSourceType source, Integer id) {
+        return resolveDataService(source).getSceneById(id);
+    }
+
+    // Calls the SQL-only lookahead implementation directly for easy endpoint testing.
+    public SceneLookaheadResponseDTO getSqlSceneLookAheadById(DataSourceType source,Integer id) {
         return resolveDataService(source).getSceneById(id);
     }
 

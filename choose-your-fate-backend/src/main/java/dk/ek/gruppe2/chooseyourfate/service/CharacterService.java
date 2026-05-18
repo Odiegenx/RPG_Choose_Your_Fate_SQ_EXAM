@@ -1,6 +1,7 @@
 package dk.ek.gruppe2.chooseyourfate.service;
 
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.CharacterViewResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.interfaces.CharacterDataAccess;
@@ -34,6 +35,11 @@ public class CharacterService {
 
     public CharacterResponseDTO getCharacterById(DataSourceType sourceHeader, String id) {
         return resolveDataAccess(sourceHeader).getCharacterById(sourceHeader == DataSourceType.MONGODB ? id : Integer.parseInt(id));
+    }
+
+    // Returns the combined character view; currently implemented for SQL because MongoDB and Neo4j character services are not implemented yet.
+    public CharacterViewResponseDTO getCharacterViewById(DataSourceType sourceHeader, Integer id) {
+        return resolveDataAccess(sourceHeader).getCharacterViewById(id);
     }
 
     public CharacterResponseDTO createCharacter(DataSourceType sourceHeader, CreateCharacterRequestDTO request) {

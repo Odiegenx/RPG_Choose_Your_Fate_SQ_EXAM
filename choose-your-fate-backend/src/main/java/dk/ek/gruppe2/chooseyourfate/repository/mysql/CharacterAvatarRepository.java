@@ -15,4 +15,7 @@ public interface CharacterAvatarRepository extends JpaRepository<CharacterAvatar
     List<CharacterAvatar> findByScene_Id(Integer sceneId);
 
     boolean existsByRaceDetails_Id(Integer raceDetailsId);
+
+    // Counts how many characters an account already has.
+    long countByAccount_Id(Integer accountId);
 }

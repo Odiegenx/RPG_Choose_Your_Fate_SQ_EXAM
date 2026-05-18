@@ -1,6 +1,7 @@
 package dk.ek.gruppe2.chooseyourfate.service.mongodb;
 
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.CharacterViewResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.interfaces.CharacterDataAccess;
 import dk.ek.gruppe2.chooseyourfate.model.mongodb.CharacterAvatarDocumentMongo;
@@ -46,6 +47,11 @@ public class MongoCharacterService implements CharacterDataAccess<String> {
         return getCharacterentitesByAccountId(id).stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+    @Override
+    public CharacterViewResponseDTO getCharacterViewById(Integer id) {
+        throw new UnsupportedOperationException(MESSAGE);
     }
 
     private List<CharacterAvatarDocumentMongo> getCharacterentitesByAccountId(String id) {

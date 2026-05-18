@@ -1,6 +1,7 @@
 package dk.ek.gruppe2.chooseyourfate.controller;
 
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.CharacterViewResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.service.CharacterService;
@@ -41,6 +42,16 @@ public class CharacterController {
     ) {
         
         return characterService.getCharacterById(dataSource, id);
+    }
+
+    // Returns the character screen view with character, chapter, race, stats, and creation-limit info together.
+    @GetMapping("/{id}/view")
+    @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#id, authentication)")
+    public CharacterViewResponseDTO getCharacterViewById(
+            @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
+            @PathVariable Integer id
+    ) {
+        return characterService.getCharacterViewById(dataSource, id);
     }
 
     @PostMapping

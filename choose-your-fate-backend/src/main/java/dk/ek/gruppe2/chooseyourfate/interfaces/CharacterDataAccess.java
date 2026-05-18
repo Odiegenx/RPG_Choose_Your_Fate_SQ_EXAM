@@ -1,6 +1,7 @@
 package dk.ek.gruppe2.chooseyourfate.interfaces;
 
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.CharacterViewResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 
 import java.util.List;
@@ -17,4 +18,5 @@ public interface CharacterDataAccess<T> {
 
     List<CharacterResponseDTO> getCharactersByAccountId(T id);
 
+    CharacterViewResponseDTO getCharacterViewById(Integer id);
 }

@@ -1,6 +1,10 @@
 package dk.ek.gruppe2.chooseyourfate.dto.scene;
 
+import dk.ek.gruppe2.chooseyourfate.dto.choice.ChoiceResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Scene;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.Choice;
+import java.util.Comparator;
+import java.util.List;
 
 public class SceneResponseDTO {
     private Integer id;

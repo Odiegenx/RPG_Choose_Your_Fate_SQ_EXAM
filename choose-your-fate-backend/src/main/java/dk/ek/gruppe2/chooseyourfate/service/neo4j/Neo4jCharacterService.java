@@ -1,6 +1,7 @@
 package dk.ek.gruppe2.chooseyourfate.service.neo4j;
 
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.CharacterViewResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.interfaces.CharacterDataAccess;
 
@@ -36,6 +37,11 @@ public class Neo4jCharacterService implements CharacterDataAccess<Integer> {
 
     @Override
     public List<CharacterResponseDTO> getCharactersByAccountId(Integer id) {
+        throw new UnsupportedOperationException(MESSAGE);
+    }
+
+    @Override
+    public CharacterViewResponseDTO getCharacterViewById(Integer id) {
         throw new UnsupportedOperationException(MESSAGE);
     }
 }
