@@ -18,7 +18,6 @@ public class Item {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(length = 45)
     private ItemType type;
 
     public Item() {}
