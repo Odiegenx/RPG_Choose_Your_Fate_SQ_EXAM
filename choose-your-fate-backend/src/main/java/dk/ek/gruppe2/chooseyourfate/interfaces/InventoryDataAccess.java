@@ -6,4 +6,7 @@ public interface InventoryDataAccess {
 
     InventoryResponseDTO getInventoryByCharacterId(Integer characterId);
 
+    InventoryResponseDTO addItemToInventory(Integer inventoryId, Integer itemId);
+
+    void useItem(Integer inventoryId, Integer itemId);
 }
