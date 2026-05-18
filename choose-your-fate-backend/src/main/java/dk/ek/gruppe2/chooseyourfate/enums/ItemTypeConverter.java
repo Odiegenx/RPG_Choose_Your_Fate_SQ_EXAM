@@ -9,7 +9,7 @@ public class ItemTypeConverter implements AttributeConverter<ItemType, String> {
     @Override
     public String convertToDatabaseColumn(ItemType type) {
         if (type == null) return null;
-        return type.name().toLowerCase();
+        return type.name();
     }
 
     @Override
