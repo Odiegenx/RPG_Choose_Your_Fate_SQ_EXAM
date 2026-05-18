@@ -33,6 +33,7 @@ public class AccountMigrationServiceMongo {
                     .password(entity.getPassword())
                     .email(entity.getEmail())
                     .characterLimit(entity.getCharacterLimit())
+                    .role(entity.getRole())
                     .build();
 
             // 2. save to MongoDB

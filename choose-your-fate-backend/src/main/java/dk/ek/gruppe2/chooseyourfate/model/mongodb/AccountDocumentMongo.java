@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import dk.ek.gruppe2.chooseyourfate.enums.Role;
+
 @Document(collection = "accounts")
 @Data
 @Builder
@@ -20,4 +22,5 @@ public class AccountDocumentMongo {
     private String password;
     private int characterLimit;
     private String email;
+    private Role role;
 }

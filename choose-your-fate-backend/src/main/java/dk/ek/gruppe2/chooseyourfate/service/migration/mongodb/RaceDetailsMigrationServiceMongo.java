@@ -27,7 +27,17 @@ public class RaceDetailsMigrationServiceMongo {
         List<RaceDetails> entities = mysqlRepo.findAll();
 
         for (RaceDetails entity : entities) {
-            RaceDetailsDocumentMongo doc = RaceDetailsDocumentMongo.builder().build();
+
+            // resolve scene ID
+            String mongoStartingChapterId = idMappingService.get(
+                    CollectionNames.CHAPTERS,
+                    entity.getStartingChapter().getId()
+            );
+
+            RaceDetailsDocumentMongo doc = RaceDetailsDocumentMongo.builder()
+            .name(entity.getName())
+            .startingChapterId(mongoStartingChapterId)
+            .build();
 
             mongoRepo.save(doc);
 
