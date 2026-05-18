@@ -66,9 +66,9 @@ public class SqlEquipmentService implements EquipmentDataAccess {
     private EquipmentResponseDTO toDto(Equipment equipment) {
         return new EquipmentResponseDTO(
                 equipment.getCharacterId(),
-                equipment.getHead() == null ? null : itemService.findById(equipment.getHead().getId()),
-                equipment.getChest() == null ? null : itemService.findById(equipment.getChest().getId()),
-                equipment.getLegs() == null ? null : itemService.findById(equipment.getLegs().getId())
+                equipment.getHead() == null ? null : itemService.toDto(equipment.getHead()),
+                equipment.getChest() == null ? null : itemService.toDto(equipment.getChest()),
+                equipment.getLegs() == null ? null : itemService.toDto(equipment.getLegs())
         );
     }
 
