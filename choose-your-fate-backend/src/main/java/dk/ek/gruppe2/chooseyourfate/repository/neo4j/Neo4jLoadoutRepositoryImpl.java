@@ -52,7 +52,7 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
     }
     // Finder alle items i characterens inventory sammen med amount på CONTAINS-relationen.
     // Hvis inventoryen er tom, returneres stadig inventoryen, men uden item-data.
-    private List<InventoryItemData> findInventoryItems(Integer charaterId){
+    private List<InventoryItemData> findInventoryItems(Integer characterId){
         return new ArrayList<>(neo4jClient.query("""
                         MATCH (:Character {id: $characterId})-[:HAS_INVENTORY]->(inv:Inventory)
                         OPTIONAL MATCH (inv)-[r:CONTAINS]->(item:Item)
@@ -63,7 +63,7 @@ public class Neo4jLoadoutRepositoryImpl implements Neo4jLoadoutRepository {
                                item.type AS type,
                                r.amount AS amount
                         ORDER BY item.id
-                        """).bind(charaterId).to("characterId")
+                        """).bind(characterId).to("characterId")
                 .fetchAs(InventoryItemData.class)
                 .mappedBy(((typeSystem, itemRecord) -> {
                     if (itemRecord.get("itemId").isNull()) {
