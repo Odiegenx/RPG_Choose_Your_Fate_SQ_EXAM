@@ -1,19 +1,38 @@
-# Mandatory-one-database
+# RPG Choose Your Fate SQ
 
-To run the container detached
+To run the SQL containers detached:
 
+```bash
 docker compose up -d
+```
 
 With the spring application running: http://localhost:8080/swagger-ui/index.html#/
 
 All our SQL scripts are in rpg_mysql folder
 
 MySQL seed data is available in `rpg_mysql/06_seed_data.sql`.
-If the MySQL Docker volume already exists, reload the schema and seed data with:
+The Software Quality version uses one primary MySQL container on port `3307` and one secondary MySQL container on port `3308`.
 
-To run the application with databases use "docker compose up -d" and make sure the needed ports (They can be found in the docker compose file) are open.
-Then simply run the Spring Boot application
+The availability design is intentionally scoped:
 
+- primary SQL is the normal active database
+- secondary SQL is the failover database
+- successful primary writes create application-level replication jobs
+- replication is asynchronous, so eventual consistency is accepted
+- failback to primary is manual and should happen during a maintenance window
+
+Availability status endpoints are exposed under:
+
+```text
+GET  /availability/status
+POST /availability/failover
+POST /availability/failback/begin
+POST /availability/failback/complete
+```
+
+If the MySQL Docker volumes already exist, reload the schema and seed data with:
+
+```bash
 docker compose down -v
 docker compose up -d
-
+```
