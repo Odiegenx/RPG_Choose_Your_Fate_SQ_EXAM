@@ -42,7 +42,7 @@ public class SceneController {
     @GetMapping("/{id}")
     public SceneResponseDTO getsceneById(
             @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
-            @PathVariable Integer id
+            @PathVariable String id
     ) {
         return sceneService.getSceneById(dataSource, id);
     }
@@ -60,7 +60,7 @@ public class SceneController {
     @PreAuthorize("hasRole('ADMIN')")
     public SceneResponseDTO updatescene(
             @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
-            @PathVariable Integer id,
+            @PathVariable String id,
             @RequestBody UpdateSceneRequestDTO request
     ) {
         return sceneService.updateScene(dataSource, id, request);
@@ -70,7 +70,7 @@ public class SceneController {
     @PreAuthorize("hasRole('ADMIN')")
     public void deletescene(
             @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
-            @PathVariable Integer id
+            @PathVariable String id
     ) {
         sceneService.deleteScene(dataSource, id);
     }
@@ -78,7 +78,7 @@ public class SceneController {
     @GetMapping("/{id}/lookahead")
     public SceneLookaheadResponseDTO getSceneLookahead(
             @RequestHeader(value = DATA_SOURCE_HEADER, required = false) DataSourceType dataSource,
-            @PathVariable Integer id
+            @PathVariable String id
     ) {
         return sceneService.getSceneLookahead(dataSource, id);
     }

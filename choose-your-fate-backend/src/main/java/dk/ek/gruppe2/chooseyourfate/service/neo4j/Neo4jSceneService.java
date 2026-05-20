@@ -25,16 +25,18 @@ public class Neo4jSceneService implements SceneDataAccess {
     }
 
     @Override
-    public SceneResponseDTO getSceneById(Integer id) {
-        return neo4jSceneRepository.getSceneById(id);
+    public SceneResponseDTO getSceneById(String id) {
+        Integer parsedId = Integer.parseInt(id);
+        return neo4jSceneRepository.getSceneById(parsedId);
     }
 
     @Override
-    public SceneLookaheadResponseDTO getSceneLookahead(Integer id) {
+    public SceneLookaheadResponseDTO getSceneLookahead(String id) {
+        Integer parsedId = Integer.parseInt(id);
         return new SceneLookaheadResponseDTO(
-                neo4jSceneRepository.findSceneForLookahead(id),
-                neo4jSceneRepository.findChoicesForScene(id),
-                neo4jSceneRepository.findDestinationScenesForScene(id)
+                neo4jSceneRepository.findSceneForLookahead(parsedId),
+                neo4jSceneRepository.findChoicesForScene(parsedId),
+                neo4jSceneRepository.findDestinationScenesForScene(parsedId)
         );
     }
 
@@ -44,12 +46,14 @@ public class Neo4jSceneService implements SceneDataAccess {
     }
 
     @Override
-    public SceneResponseDTO updateScene(Integer id, UpdateSceneRequestDTO request) {
-        return neo4jSceneRepository.updateScene(id, request);
+    public SceneResponseDTO updateScene(String id, UpdateSceneRequestDTO request) {
+        Integer parsedId = Integer.parseInt(id);
+        return neo4jSceneRepository.updateScene(parsedId, request);
     }
 
     @Override
-    public void deleteScene(Integer id) {
-        neo4jSceneRepository.deleteScene(id);
+    public void deleteScene(String id) {
+        Integer parsedId = Integer.parseInt(id);
+        neo4jSceneRepository.deleteScene(parsedId);
     }
 }

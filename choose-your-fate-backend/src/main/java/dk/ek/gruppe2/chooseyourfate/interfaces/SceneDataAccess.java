@@ -10,13 +10,13 @@ import dk.ek.gruppe2.chooseyourfate.dto.scene.UpdateSceneRequestDTO;
 public interface SceneDataAccess {
     List<SceneResponseDTO> getAllScenes();
 
-    SceneResponseDTO getSceneById(Integer id);
+    SceneResponseDTO getSceneById(String id);
 
     SceneResponseDTO createScene(CreateSceneRequestDTO request);
 
-    SceneResponseDTO updateScene(Integer id, UpdateSceneRequestDTO request);
+    SceneResponseDTO updateScene(String id, UpdateSceneRequestDTO request);
 
-    void deleteScene(Integer id);
+    void deleteScene(String id);
 
-    SceneLookaheadResponseDTO getSceneLookahead(Integer id);
+    SceneLookaheadResponseDTO getSceneLookahead(String id);
 }

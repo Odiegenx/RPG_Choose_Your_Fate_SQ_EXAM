@@ -37,7 +37,7 @@ public class SqlSceneService implements SceneDataAccess {
 
     @Override
     // Returns one SQL scene with the choices and destination scenes already loaded.
-    public SceneResponseDTO getSceneById(Integer id) {
+    public SceneResponseDTO getSceneById(String id) {
         return new SceneResponseDTO(getSceneEntity(id));
     }
 
@@ -48,7 +48,7 @@ public class SqlSceneService implements SceneDataAccess {
     }
 
     @Override
-    public SceneResponseDTO updateScene(Integer id, UpdateSceneRequestDTO request) {
+    public SceneResponseDTO updateScene(String id, UpdateSceneRequestDTO request) {
         Scene scene = getSceneEntity(id);
         scene.setName(request.getName());
         scene.setChapter(getChapterById(request.getChapterId()));
@@ -56,15 +56,17 @@ public class SqlSceneService implements SceneDataAccess {
     }
 
     @Override
-    public void deleteScene(Integer id) {
-        if (!sceneRepository.existsById(id)) {
+    public void deleteScene(String id) {
+        Integer parsedId = Integer.parseInt(id);
+        if (!sceneRepository.existsById(parsedId)) {
             throw new ResourceNotFoundException("Scene not found with id: " + id);
         }
-        sceneRepository.deleteById(id);
+        sceneRepository.deleteById(parsedId);
     }
 
-    private Scene getSceneEntity(Integer id) {
-        return sceneRepository.findByIdWithLookAhead(id)
+    private Scene getSceneEntity(String id) {
+        Integer parsedId = Integer.parseInt(id);
+        return sceneRepository.findByIdWithLookAhead(parsedId)
                 .orElseThrow(() -> new ResourceNotFoundException("Scene not found with id: " + id));
     }
 
@@ -74,7 +76,7 @@ public class SqlSceneService implements SceneDataAccess {
     }
 
     @Override
-    public SceneLookaheadResponseDTO getSceneLookahead(Integer id) {
+    public SceneLookaheadResponseDTO getSceneLookahead(String id) {
         return new SceneLookaheadResponseDTO(getSceneEntity(id));
     }
 }

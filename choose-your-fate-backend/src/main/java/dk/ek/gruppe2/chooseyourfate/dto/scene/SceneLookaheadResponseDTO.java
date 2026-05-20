@@ -1,6 +1,7 @@
 package dk.ek.gruppe2.chooseyourfate.dto.scene;
 
 import dk.ek.gruppe2.chooseyourfate.dto.choice.ChoiceResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.model.mongodb.SceneDocumentMongo;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Choice;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Scene;
 
@@ -40,6 +41,30 @@ public class SceneLookaheadResponseDTO {
             return new SceneResponseDTO(choice.getDestinationScene());
         })
                 .toList();
+    }
+
+    public SceneLookaheadResponseDTO(SceneDocumentMongo scene) {
+        this.scene = new SceneResponseDTO(scene.getId(), scene.getName(), scene.getChapterId());
+        this.choices = scene.getChoices()
+                .stream()
+                .map(choice -> new ChoiceResponseDTO(
+                        choice.getId(),
+                        choice.getDestinationId(),
+                        scene.getId(),
+                        choice.getDescription(),
+                        choice.getConsequence(),
+                        choice.getTargetId(),
+                        choice.getValue(),
+                        choice.getRequirements()))
+                .toList();
+        this.destinationScenes = scene.getChoices()
+                .stream()
+                .filter(choice -> choice.getDestinationScene() != null)
+                .map(choice -> new SceneResponseDTO(
+                        choice.getDestinationScene().getId(),
+                        choice.getDestinationScene().getName(),
+                        choice.getDestinationScene().getChapterId()))
+            .toList();
     }
     public SceneResponseDTO getScene() {
         return scene;

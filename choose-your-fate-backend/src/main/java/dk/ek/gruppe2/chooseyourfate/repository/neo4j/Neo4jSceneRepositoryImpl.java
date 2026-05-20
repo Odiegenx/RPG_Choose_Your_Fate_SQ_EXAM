@@ -128,18 +128,18 @@ public class Neo4jSceneRepositoryImpl implements Neo4jSceneRepository {
 
     private SceneResponseDTO toSceneResponseDTO(SceneData sceneData) {
         return new SceneResponseDTO(
-                sceneData.id(),
+                sceneData.id().toString(),
                 sceneData.name(),
-                sceneData.chapterId()
+                sceneData.chapterId().toString()
         );
     }
 
 
     private ChoiceResponseDTO toChoiceResponseDTO(ChoiceData choiceData) {
         return new ChoiceResponseDTO(
-                choiceData.id(),
-                choiceData.destinationSceneId(),
-                choiceData.sceneId(),
+                choiceData.id().toString(),
+                choiceData.destinationSceneId().toString(),
+                choiceData.sceneId().toString(),
                 choiceData.description(),
                 choiceData.consequence(),
                 choiceData.targetId(),

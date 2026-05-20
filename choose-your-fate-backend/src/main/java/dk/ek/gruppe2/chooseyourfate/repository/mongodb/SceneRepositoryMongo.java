@@ -1,5 +1,8 @@
 package dk.ek.gruppe2.chooseyourfate.repository.mongodb;
 
+import dk.ek.gruppe2.chooseyourfate.dto.scene.CreateSceneRequestDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneResponseDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.scene.UpdateSceneRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.model.mongodb.SceneDocumentMongo;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -25,4 +28,7 @@ public interface SceneRepositoryMongo extends MongoRepository<SceneDocumentMongo
     Optional<SceneDocumentMongo> findByIdWithNextScenes(String id);
 
     List<SceneDocumentMongo> findAll();
+
+    SceneDocumentMongo getSceneById(String id);
+
 }
