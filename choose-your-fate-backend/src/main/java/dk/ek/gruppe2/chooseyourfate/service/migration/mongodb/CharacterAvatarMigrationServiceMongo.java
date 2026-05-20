@@ -21,11 +21,13 @@ public class CharacterAvatarMigrationServiceMongo {
     private final CharacterAvatarRepository mysqlRepo;
     private final CharacterAvatarRepositoryMongo mongoRepo;
     private final CharacterDetailsRepository characterDetailsRepository;
+    private final EquipmentRepository equipmentRepository;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryHasItemRepository inventoryHasItemRepository;
     private final CharacterPathRepository characterPathRepository;
     private final CharacterPathChoiceRepository characterPathChoiceRepository;
     private final CharacterHasQuestRepository characterHasQuestRepository;
     private final SceneRepositoryMongo sceneMongoRepo;
-    private final EquipmentInventoryMigrationServiceMongo equipmentInventoryMigrationService;
     private final IdMappingService idMappingService;
 
     public void migrate() {
@@ -55,8 +57,8 @@ public class CharacterAvatarMigrationServiceMongo {
 
             // transform embedded objects
             CharacterDetailsMongo details = transformDetails(entity.getId());
-            EquipmentMongo equipment = equipmentInventoryMigrationService.transformEquipment(entity.getId());
-            InventoryMongo inventory = equipmentInventoryMigrationService.transformInventory(entity.getId());
+            EquipmentMongo equipment = transformEquipment(entity.getId());
+            InventoryMongo inventory = transformInventory(entity.getId());
             CharacterPathMongo path = transformPath(entity.getId());
             List<CharacterQuestMongo> quests = transformQuests(entity.getId());
 
@@ -90,6 +92,39 @@ public class CharacterAvatarMigrationServiceMongo {
                         .fashion(d.getFashion())
                         .build())
                 .orElse(null);
+    }
+
+    private EquipmentMongo transformEquipment(Integer characterId) {
+        return equipmentRepository.findById(characterId)
+                .map(e -> EquipmentMongo.builder()
+                        .headItemId(e.getHead() != null
+                                ? idMappingService.get(CollectionNames.ITEMS, e.getHead().getId())
+                                : null)
+                        .legsItemId(e.getLegs() != null
+                                ? idMappingService.get(CollectionNames.ITEMS, e.getLegs().getId())
+                                : null)
+                        .chestItemId(e.getChest() != null
+                                ? idMappingService.get(CollectionNames.ITEMS, e.getChest().getId())
+                                : null)
+                        .build())
+                .orElse(null);
+    }
+
+    private InventoryMongo transformInventory(Integer characterId) {
+        Inventory inv = inventoryRepository.findByCharacter_Id(characterId);
+
+        List<InventoryEntryMongo> entries = inventoryHasItemRepository
+                .findByInventory_Id(inv.getId())
+                .stream()
+                .map(ihi -> InventoryEntryMongo.builder()
+                        .itemId(idMappingService.get(CollectionNames.ITEMS, ihi.getItem().getId()))
+                        .amount(ihi.getAmount())
+                        .build())
+                .toList();
+
+        return InventoryMongo.builder()
+                .inventoryEntries(entries)
+                .build();
     }
 
     private CharacterPathMongo transformPath(Integer characterId) {

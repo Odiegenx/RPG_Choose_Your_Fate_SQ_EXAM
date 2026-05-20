@@ -56,10 +56,10 @@ public class CustomUserDetails implements UserDetails {
         }
         
         switch (dataSource) {
-            case SQL:
+            case DataSourceType.SQL:
                 return getAuthoritiesSQL();
 
-            case MONGODB:
+            case DataSourceType.MONGODB:
                 return getAuthoritiesMONGO();
             
             // case DataSourceType.NEO4J:
@@ -97,10 +97,10 @@ public class CustomUserDetails implements UserDetails {
 
     public String getPassword(DataSourceType dataSource) { 
         switch (dataSource) {
-            case SQL:
+            case DataSourceType.SQL:
                 return accountSql.getPassword();
 
-            case MONGODB:
+            case DataSourceType.MONGODB:
                 return accountMongo.getPassword();
             
             // case DataSourceType.NEO4J:
@@ -113,10 +113,10 @@ public class CustomUserDetails implements UserDetails {
 
     public String getUsername(DataSourceType dataSource) {
          switch (dataSource) {
-            case SQL:
+            case DataSourceType.SQL:
                 return accountSql.getUsername();
 
-            case MONGODB:
+            case DataSourceType.MONGODB:
                 return accountMongo.getUsername();
             
             // case DataSourceType.NEO4J:
@@ -129,10 +129,10 @@ public class CustomUserDetails implements UserDetails {
 
     public String getId(DataSourceType dataSource) { 
         switch (dataSource) {
-            case SQL:
+            case DataSourceType.SQL:
                 return accountSql.getId().toString();
 
-            case MONGODB:
+            case DataSourceType.MONGODB:
                 return accountMongo.getId();
             
             // case DataSourceType.NEO4J:
