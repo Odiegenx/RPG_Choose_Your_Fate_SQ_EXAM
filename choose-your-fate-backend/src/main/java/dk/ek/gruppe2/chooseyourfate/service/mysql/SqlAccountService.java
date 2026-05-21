@@ -46,7 +46,7 @@ public class SqlAccountService implements AccountDataAccess {
         account.setCharacterLimit(3);
         account.setPassword(encoder.encode(request.getPassword()));
 
-        return new AccountResponseDTO(accountRepository.save(account));
+        return new AccountResponseDTO(accountRepository.saveAndFlush(account));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class SqlAccountService implements AccountDataAccess {
             account.setPassword(encoder.encode(request.getPassword()));
         }
 
-        return new AccountResponseDTO(accountRepository.save(account));
+        return new AccountResponseDTO(accountRepository.saveAndFlush(account));
     }
 
     @Override

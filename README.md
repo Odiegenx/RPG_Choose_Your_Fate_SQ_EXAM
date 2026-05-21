@@ -19,6 +19,9 @@ The availability design is intentionally scoped:
 - secondary SQL is the failover database
 - successful primary writes create application-level replication jobs
 - replication is asynchronous, so eventual consistency is accepted
+- the primary health monitor checks primary on a fixed interval
+- emergency failover tries to drain queued replication jobs before switching to secondary
+- manual failover requires the replication queue to be empty
 - failback to primary is manual and should happen during a maintenance window
 
 Availability status endpoints are exposed under:

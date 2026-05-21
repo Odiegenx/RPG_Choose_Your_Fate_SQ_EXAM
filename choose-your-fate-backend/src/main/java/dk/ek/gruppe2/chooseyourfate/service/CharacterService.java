@@ -1,7 +1,7 @@
 package dk.ek.gruppe2.chooseyourfate.service;
 
-import dk.ek.gruppe2.chooseyourfate.availability.ReplicationOperationType;
-import dk.ek.gruppe2.chooseyourfate.availability.WriteOperationCoordinator;
+import dk.ek.gruppe2.chooseyourfate.availability.replication.ReplicationOperationType;
+import dk.ek.gruppe2.chooseyourfate.availability.replication.WriteOperationCoordinator;
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;

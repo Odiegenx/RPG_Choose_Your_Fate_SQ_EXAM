@@ -1,11 +1,11 @@
 package dk.ek.gruppe2.chooseyourfate.controller;
 
-import dk.ek.gruppe2.chooseyourfate.availability.AvailabilityStatusResponse;
-import dk.ek.gruppe2.chooseyourfate.availability.DatabaseRoutingService;
-import dk.ek.gruppe2.chooseyourfate.availability.FailbackService;
-import dk.ek.gruppe2.chooseyourfate.availability.FailoverService;
-import dk.ek.gruppe2.chooseyourfate.availability.PrimaryHealthService;
-import dk.ek.gruppe2.chooseyourfate.availability.ReplicationQueue;
+import dk.ek.gruppe2.chooseyourfate.availability.dto.AvailabilityStatusResponse;
+import dk.ek.gruppe2.chooseyourfate.availability.routing.DatabaseRoutingService;
+import dk.ek.gruppe2.chooseyourfate.availability.failback.FailbackService;
+import dk.ek.gruppe2.chooseyourfate.availability.failover.FailoverService;
+import dk.ek.gruppe2.chooseyourfate.availability.health.PrimaryHealthService;
+import dk.ek.gruppe2.chooseyourfate.availability.replication.ReplicationQueue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
