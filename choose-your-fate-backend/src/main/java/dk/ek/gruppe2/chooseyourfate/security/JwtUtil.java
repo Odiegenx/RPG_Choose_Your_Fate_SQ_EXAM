@@ -35,7 +35,7 @@ public class JwtUtil {
             builder.claim("NeoId", user.getId(DataSourceType.NEO4J));
         }
 
-        return Jwts.builder()
+        return builder
                 .setSubject(user.getUsername())
                 .claim("sqlId", user.getId(DataSourceType.SQL))
                 .claim("role", user.getAuthorities().iterator().next().getAuthority())
