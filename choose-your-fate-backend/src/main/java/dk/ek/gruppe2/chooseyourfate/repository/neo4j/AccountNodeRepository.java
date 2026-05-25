@@ -3,6 +3,8 @@ package dk.ek.gruppe2.chooseyourfate.repository.neo4j;
 import java.util.List;
 import java.util.Optional;
 
+import dk.ek.gruppe2.chooseyourfate.enums.Role;
+
 public interface AccountNodeRepository {
 
     List<AccountData> findAllAccountData();
@@ -12,6 +14,8 @@ public interface AccountNodeRepository {
     Optional<AccountSnapshot> findAccountSnapshotById(Integer id);
 
     Optional<Integer> findAccountIdByUsername(String username);
+
+    Optional<AccountSnapshot> findAccountSnapshotByUsername(String username);     
 
     Optional<Integer> findAccountIdByEmail(String email);
 
@@ -53,7 +57,7 @@ public interface AccountNodeRepository {
             Integer characterLimit,
             String email,
             String password,
-            String role
+            Role role
     ) {
     }
 }

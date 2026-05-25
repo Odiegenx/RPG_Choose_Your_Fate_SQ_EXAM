@@ -3,6 +3,9 @@ package dk.ek.gruppe2.chooseyourfate.repository.neo4j;
 import org.springframework.data.neo4j.core.Neo4jClient;
 import org.springframework.stereotype.Repository;
 
+import dk.ek.gruppe2.chooseyourfate.enums.Role;
+import dk.ek.gruppe2.chooseyourfate.repository.neo4j.AccountNodeRepository.AccountSnapshot;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -70,7 +73,7 @@ public class AccountNodeRepositoryImpl implements AccountNodeRepository {
                         accountRecord.get("characterLimit").asInt(),
                         accountRecord.get("email").asString(),
                         accountRecord.get("password").asString(),
-                        accountRecord.get("role").asString()
+                        Role.valueOf(accountRecord.get("role").asString())
                 ))
                 .one();
     }
@@ -170,5 +173,29 @@ public class AccountNodeRepositoryImpl implements AccountNodeRepository {
                 .mappedBy((typeSystem, deleteRecord) -> deleteRecord.get("deletedCount").asInt())
                 .one()
                 .orElse(0);
+    }
+
+    @Override
+    public Optional<AccountSnapshot> findAccountSnapshotByUsername(String username) {
+         return neo4jClient.query("""
+                        MATCH (a:Account {username: $username})
+                        RETURN a.id AS id,
+                               a.username AS username,
+                               a.characterLimit AS characterLimit,
+                               a.email AS email,
+                               a.password AS password,
+                               a.role AS role
+                        """)
+                .bind(username).to("username")
+                .fetchAs(AccountSnapshot.class)
+                .mappedBy((typeSystem, accountRecord) -> new AccountSnapshot(
+                        accountRecord.get("id").asInt(),
+                        accountRecord.get("username").asString(),
+                        accountRecord.get("characterLimit").asInt(),
+                        accountRecord.get("email").asString(),
+                        accountRecord.get("password").asString(),
+                        Role.valueOf(accountRecord.get("role").asString())
+                ))
+                .one();
     }
 }

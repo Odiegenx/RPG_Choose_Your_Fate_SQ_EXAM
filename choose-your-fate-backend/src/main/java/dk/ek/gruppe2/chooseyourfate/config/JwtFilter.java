@@ -55,11 +55,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
                     Map<String, Object> extraInfo = new HashMap<>();
                     extraInfo.put("sqlId", user.getId(DataSourceType.SQL));
-                    if (user.mongoIsNull()) {
+                    if (!user.mongoIsNull()) {
                         extraInfo.put("MongoId", user.getId(DataSourceType.MONGODB));
                     }
-                    //TODO: implement neo4j method check
-                    extraInfo.put("NeoId", user.getId(DataSourceType.NEO4J));
+                    if (!user.neoIsNull()) {
+                        extraInfo.put("NeoId", user.getId(DataSourceType.NEO4J));
+                    }
 
                     auth.setDetails(extraInfo);
 

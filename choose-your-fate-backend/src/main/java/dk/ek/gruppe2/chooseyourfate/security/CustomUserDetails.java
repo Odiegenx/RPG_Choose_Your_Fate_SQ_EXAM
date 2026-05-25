@@ -8,6 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
 import dk.ek.gruppe2.chooseyourfate.model.mongodb.AccountDocumentMongo;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Account;
+import dk.ek.gruppe2.chooseyourfate.model.neo4j.AccountNode;
+import dk.ek.gruppe2.chooseyourfate.repository.neo4j.AccountNodeRepository.AccountData;
+import dk.ek.gruppe2.chooseyourfate.repository.neo4j.AccountNodeRepository.AccountSnapshot;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,14 +19,14 @@ public class CustomUserDetails implements UserDetails {
 
     private final Account accountSql;
     private final AccountDocumentMongo accountMongo;
-    // private final Optional<AccountNode> accountNeo4J;
+    private final AccountSnapshot accountNeo4J;
 
     
 
-    public CustomUserDetails(Account accountSql, AccountDocumentMongo accountMongo/*, Optional<AccountNode> accountNeo4J*/) {
+    public CustomUserDetails(Account accountSql, AccountDocumentMongo accountMongo, AccountSnapshot accountNeo4J) {
         this.accountSql = accountSql;
         this.accountMongo = accountMongo;
-        // this.accountNeo4J = accountNeo4J;
+        this.accountNeo4J = accountNeo4J;
     }
 
     public boolean mongoIsNull(){
@@ -34,13 +37,13 @@ public class CustomUserDetails implements UserDetails {
         return false;
     }
 
-    // public boolean neoIsNull(){
-    //     if (accountNeo4J == null) {
-    //         return true;
-    //     }
+    public boolean neoIsNull(){
+        if (accountNeo4J == null) {
+            return true;
+        }
 
-    //     return false;
-    // }
+        return false;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -62,8 +65,8 @@ public class CustomUserDetails implements UserDetails {
             case DataSourceType.MONGODB:
                 return getAuthoritiesMONGO();
             
-            // case DataSourceType.NEO4J:
-            //     return getAuthoritiesNEO4J();
+            case DataSourceType.NEO4J:
+                return getAuthoritiesNEO4J();
         
             default:
                 return getAuthoritiesSQL();
@@ -87,13 +90,13 @@ public class CustomUserDetails implements UserDetails {
         return List.of(new SimpleGrantedAuthority(accountMongo.getRole().name()));
     }
 
-    // private Collection<? extends GrantedAuthority> getAuthoritiesNEO4J() {
-    //     if (accountNeo4J.getRole() == null) {
-    //         throw new IllegalStateException("Account role is null for user: " + accountNeo4J.getUsername());
-    //     }
+    private Collection<? extends GrantedAuthority> getAuthoritiesNEO4J() {
+        if (accountNeo4J.role() == null) {
+            throw new IllegalStateException("Account role is null for user: " + accountNeo4J.username());
+        }
 
-    //     return List.of(new SimpleGrantedAuthority(accountNeo4J.getRole().name()));
-    // }
+        return List.of(new SimpleGrantedAuthority(accountNeo4J.role().name()));
+    }
 
     public String getPassword(DataSourceType dataSource) { 
         switch (dataSource) {
@@ -103,8 +106,8 @@ public class CustomUserDetails implements UserDetails {
             case DataSourceType.MONGODB:
                 return accountMongo.getPassword();
             
-            // case DataSourceType.NEO4J:
-            //     return accountNeo4J.getPassword();
+            case DataSourceType.NEO4J:
+                return accountNeo4J.password();
         
             default:
                 return accountSql.getPassword();
@@ -119,8 +122,8 @@ public class CustomUserDetails implements UserDetails {
             case DataSourceType.MONGODB:
                 return accountMongo.getUsername();
             
-            // case DataSourceType.NEO4J:
-            //     return accountNeo4J.getUsername();
+            case DataSourceType.NEO4J:
+                 return accountNeo4J.username();
         
             default:
                 return accountSql.getUsername();
@@ -135,8 +138,8 @@ public class CustomUserDetails implements UserDetails {
             case DataSourceType.MONGODB:
                 return accountMongo.getId();
             
-            // case DataSourceType.NEO4J:
-            //     return accountNeo4J.getId().toString();
+            case DataSourceType.NEO4J:
+                 return accountNeo4J.id().toString();
         
             default:
                 return accountSql.getId().toString();
