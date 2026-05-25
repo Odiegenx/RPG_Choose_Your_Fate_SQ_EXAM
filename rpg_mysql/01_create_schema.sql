@@ -401,18 +401,13 @@ CREATE TABLE IF NOT EXISTS `choose_your_fate`.`choice_has_item` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
-USE `choose_your_fate` ;
-
--- -----------------------------------------------------
--- Placeholder table for view `choose_your_fate`.`v_character`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `choose_your_fate`.`v_character` (`id` INT);
+USE `choose_your_fate`;
 
 -- -----------------------------------------------------
 -- View `choose_your_fate`.`v_character`
 -- -----------------------------------------------------
-DROP VIEW IF EXISTS `defaultdb`.`v_character`;
-USE `defaultdb`;
+DROP VIEW IF EXISTS `choose_your_fate`.`v_character`;
+USE `choose_your_fate`;
 CREATE  OR REPLACE VIEW `v_character` AS (
     SELECT avatar.name, deets.intelligence, deets.charisma, deets.fashion, avatar.flag
     FROM character_details deets
