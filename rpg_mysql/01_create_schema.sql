@@ -33,6 +33,25 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
 -- -----------------------------------------------------
+-- Table `choose_your_fate`.`audit_log`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `choose_your_fate`.`audit_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `table_name` VARCHAR(100) NOT NULL,
+  `entity_id` VARCHAR(100) NOT NULL,
+  `action_type` VARCHAR(20) NOT NULL,
+  `changed_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `old_data` JSON NULL,
+  `new_data` JSON NULL,
+  PRIMARY KEY (`id`),
+  INDEX `idx_audit_log_table_name` (`table_name` ASC) VISIBLE,
+  INDEX `idx_audit_log_entity_id` (`entity_id` ASC) VISIBLE,
+  INDEX `idx_audit_log_changed_at` (`changed_at` ASC) VISIBLE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+-- -----------------------------------------------------
 -- Table `choose_your_fate`.`chapter`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `choose_your_fate`.`chapter` (
