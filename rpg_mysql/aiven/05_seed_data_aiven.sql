@@ -110,7 +110,7 @@ INSERT INTO choice_has_item (choice_id, item_id) VALUES
 INSERT INTO character_avatar (id, account_id, chapter_id, scene_id, race_detail_id, name, flag) VALUES
     (1, 1, 1, 1, 1, 'Lyra', '{"reputation":{"guard":1},"statusEffects":[],"storyFlags":["festival-access"]}'),
     (2, 2, 1, 1, 2, 'Torben', '{"reputation":{"market":0},"statusEffects":[],"storyFlags":["watchtower-visited"]}'),
-    (3, 3, 2, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}');
+    (3, 3, 5, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}');
 
 UPDATE character_details
 SET intelligence = 7, charisma = 6, fashion = 5
