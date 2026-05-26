@@ -22,7 +22,7 @@ jobs:
     
     defaults:
       run:
-        working-directory: ./fake_info
+        working-directory: ./choose-your-fate-backend
         
     steps:
     - uses: actions/checkout@v4
@@ -41,6 +41,6 @@ jobs:
         # Artifact name. If the `archive` input is `false`, the name of the file uploaded will be the artifact name.
         name: 'backend-snapshot.jar'
         # A file, directory or wildcard pattern that describes what to upload.
-        path: /choose-your-fate-backend/target/choose-your-fate-backend-0.0.1-SNAPSHOT.jar
+        path: ./choose-your-fate-backend/target/choose-your-fate-backend-0.0.1-SNAPSHOT.jar
         # Duration after which artifact will expire in days. 0 means using default retention.
         retention-days: 2          
