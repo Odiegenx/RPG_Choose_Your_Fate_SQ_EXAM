@@ -8,9 +8,10 @@ public class TestContainerConfig {
 
     static {
         MYSQL = new MySQLContainer("mysql:9.5")
-                .withDatabaseName("testdb")
+                .withDatabaseName("choose_your_fate_test")
                 .withUsername("root")
                 .withPassword("root")
+                .withInitScript("01_schema.sql")
                 .withReuse(true);
         MYSQL.start();
     }
