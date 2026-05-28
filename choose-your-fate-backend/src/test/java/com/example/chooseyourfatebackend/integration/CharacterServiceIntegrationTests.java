@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,6 +23,8 @@ import dk.ek.gruppe2.chooseyourfate.ChooseYourFateBackendApplication;
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.Account;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterDetails;
 import dk.ek.gruppe2.chooseyourfate.service.CharacterService;
 
 @SpringBootTest(classes = ChooseYourFateBackendApplication.class)
@@ -71,6 +74,35 @@ class CharacterServiceIntegrationTests {
                 .isInstanceOf(InvalidDataAccessApiUsageException.class)
                 .hasMessageContaining("The given id must not be null");
     }
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------
+    //getCharactersViewBy_AccountId method
+    //-------------------------------------------------------------------------------------------------------------------------------------------
+    @Test
+    void getCharactersViewBy_AccountIdIsNull_ShouldThrowException() {
+        //Arrange
+        Integer queryId = null;
+
+
+        //Act + Assert
+        assertThatThrownBy(() ->
+                characterService.getCharactersViewBy_AccountId(queryId))
+                .isInstanceOf(InvalidDataAccessApiUsageException.class)
+                .hasMessageContaining("The given id must not be null");
+    }
+
+    @Test
+    void getCharactersViewBy_AccountIdDoesNotExist_ShouldReturnEmptyList() {
+        //Arrange
+        Integer queryId = 99999;
+
+        //Act + Assert
+        assertThatThrownBy(() ->
+                characterService.getCharactersViewBy_AccountId(queryId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("account not found with id: " + queryId);
+    }
+
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
     //createCharacter method

@@ -2,7 +2,9 @@ package com.example.chooseyourfatebackend.unit;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,15 +21,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.MultipleCharacterViewsResponseDto;
 import dk.ek.gruppe2.chooseyourfate.enums.Role;
 import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Account;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Chapter;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterAvatar;
+import dk.ek.gruppe2.chooseyourfate.model.mysql.CharacterDetails;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.RaceDetails;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Scene;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.AccountRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.ChapterRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterAvatarRepository;
+import dk.ek.gruppe2.chooseyourfate.repository.mysql.CharacterDetailsRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.RaceDetailsRepository;
 import dk.ek.gruppe2.chooseyourfate.repository.mysql.SceneRepository;
 import dk.ek.gruppe2.chooseyourfate.service.CharacterService;
@@ -54,6 +60,13 @@ class CharacterServiceUnitTests {
 
     @Mock
     private ChapterRepository chapterRepository;
+    
+    @Mock
+    private CharacterDetailsRepository characterDetailsRepository;
+
+    @Mock
+    private AccountRepository accountRepository;
+
 
     @InjectMocks
     private CharacterService characterService;
@@ -119,6 +132,113 @@ class CharacterServiceUnitTests {
                 characterService.getCharacterById(queryId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Character not found with id: " + queryId);
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------
+    //getCharactersViewBy_AccountId method
+    //-------------------------------------------------------------------------------------------------------------------------------------------    
+    @Test
+    void getCharactersViewBy_AccountId_shouldReturnViewsListOfSameLengthAsCounted() {
+        //Arrange
+        Integer queryId = 2;
+
+        Account account = new Account();
+        account.setId(queryId);
+        account.setCharacterLimit(5);
+        when(characterAvatarRepository.countByAccount_Id(queryId))
+            .thenReturn(Long.parseLong("2"));
+
+        when(characterAvatarRepository.findByAccount_Id(queryId))
+            .thenReturn(List.of(getCharacterAvatar(1), getCharacterAvatar(2)));
+
+        when(characterDetailsRepository.findByIdWithCharacterView(1))
+            .thenReturn(Optional.of(new CharacterDetails(1, getCharacterAvatar(1),5,2,3)));
+
+        when(characterDetailsRepository.findByIdWithCharacterView(2))
+            .thenReturn(Optional.of(new CharacterDetails(2, getCharacterAvatar(2),5,2,3)));
+
+        
+        when(accountRepository.findById(account.getId()))
+            .thenReturn(Optional.of(account));
+
+        //Act
+        MultipleCharacterViewsResponseDto viewResponse = characterService.getCharactersViewBy_AccountId(queryId);
+
+        //Act
+        assertNotNull(viewResponse);
+        assertEquals(MultipleCharacterViewsResponseDto.class, viewResponse.getClass());
+        assertEquals(2, viewResponse.getViews().size(),"Expected character to be of lengt 0 but it was: " + viewResponse.getViews().size());
+    }
+
+    @Test
+    void getCharactersViewBy_AccountId_ShouldReturnTrue_IfCharacterCount_IsLessThanAllowedAmount() {
+        //Arrange
+        Integer queryId = 2;
+
+        Account account = new Account();
+        account.setId(queryId);
+        account.setCharacterLimit(5);
+        when(characterAvatarRepository.countByAccount_Id(queryId))
+            .thenReturn(Long.parseLong("2"));
+
+        when(characterAvatarRepository.findByAccount_Id(queryId))
+            .thenReturn(List.of(getCharacterAvatar(1), getCharacterAvatar(2)));
+
+        when(characterDetailsRepository.findByIdWithCharacterView(1))
+            .thenReturn(Optional.of(new CharacterDetails(1, getCharacterAvatar(1),5,2,3)));
+
+        when(characterDetailsRepository.findByIdWithCharacterView(2))
+            .thenReturn(Optional.of(new CharacterDetails(2, getCharacterAvatar(2),5,2,3)));
+
+        
+        when(accountRepository.findById(account.getId()))
+            .thenReturn(Optional.of(account));
+        //Act
+        MultipleCharacterViewsResponseDto viewResponse = characterService.getCharactersViewBy_AccountId(queryId);
+
+        //Act
+        assertNotNull(viewResponse);
+        assertEquals(MultipleCharacterViewsResponseDto.class, viewResponse.getClass());
+        assertTrue(viewResponse.getCanCreateMoreCharacters());
+    }
+
+    @Test
+    void getCharactersViewBy_AccountId_ShouldReturnFalse_IfCharacterCount_IsMoreThanAllowedAmount() {
+        //Arrange
+        Integer queryId = 2;
+
+        Account account = new Account();
+        account.setId(queryId);
+        account.setCharacterLimit(5);
+        when(characterAvatarRepository.countByAccount_Id(queryId))
+            .thenReturn(Long.parseLong("5"));
+
+        when(characterAvatarRepository.findByAccount_Id(queryId))
+            .thenReturn(List.of(getCharacterAvatar(1), getCharacterAvatar(2),getCharacterAvatar(3), getCharacterAvatar(4), getCharacterAvatar(5)));
+
+        when(characterDetailsRepository.findByIdWithCharacterView(1))
+            .thenReturn(Optional.of(new CharacterDetails(1, getCharacterAvatar(1),5,2,3)));
+
+        when(characterDetailsRepository.findByIdWithCharacterView(2))
+            .thenReturn(Optional.of(new CharacterDetails(2, getCharacterAvatar(2),5,2,3)));
+
+        when(characterDetailsRepository.findByIdWithCharacterView(3))
+            .thenReturn(Optional.of(new CharacterDetails(3, getCharacterAvatar(2),5,2,3)));
+        when(characterDetailsRepository.findByIdWithCharacterView(4))
+            .thenReturn(Optional.of(new CharacterDetails(4, getCharacterAvatar(2),5,2,3)));
+        when(characterDetailsRepository.findByIdWithCharacterView(5))
+            .thenReturn(Optional.of(new CharacterDetails(5, getCharacterAvatar(2),5,2,3)));
+
+        when(accountRepository.findById(account.getId()))
+        
+            .thenReturn(Optional.of(account));
+        //Act
+        MultipleCharacterViewsResponseDto viewResponse = characterService.getCharactersViewBy_AccountId(queryId);
+
+        //Act
+        assertNotNull(viewResponse);
+        assertEquals(MultipleCharacterViewsResponseDto.class, viewResponse.getClass());
+        assertFalse(viewResponse.getCanCreateMoreCharacters());
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
