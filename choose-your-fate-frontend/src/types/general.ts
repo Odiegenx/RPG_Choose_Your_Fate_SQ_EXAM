@@ -25,18 +25,66 @@ export type Character = {
   flag: {};
 };
 
+export type CharacterStats = {
+  intelligence: number;
+  charisma: number;
+  fashion: number;
+};
+
+export type CharacterView = {
+  characterId: number;
+  characterName: string;
+  chapterId: number;
+  chapterName: string;
+  raceDetailsId: number;
+  raceName: string;
+  stats: CharacterStats;
+};
+
+export type CharacterViewResponse = {
+  views: CharacterView[];
+  canCreateMoreCharacters: boolean;
+};
+
+export type SelectedCharacter = Character | CharacterView;
+
 export type Props = {
   character: Character;
 };
 
 export type CharacterWindowProps = {
-  character: Character;
-  onSelect: (character: Character) => void;
+  character: CharacterView;
+  onSelect: (character: CharacterView) => void;
+};
+
+export type NewCharacterWindowProps = {
+  onSelect: (createNew: SelectedCharacter) => void;
 };
 
 export type CharacterListProps = {
-  onSelect: (character: Character) => void;
+  onSelect: (character: SelectedCharacter) => void;
+  refreshKey?: number;
 }
+
+export type NewCharacterViewProps = {
+  character: Character;
+  onCharacterCreated: () => void;
+};
+
+export type CharacterDetailViewProps = {
+  character: CharacterView;
+};
+
+export type CharacterPathStoryProps = {
+  character: CharacterView;
+};
+
+export type CharacterPath = {
+  id: number;
+  characterId: number;
+  summary: string;
+  audioBlob: string;
+};
 
 export type InventoryItem = {
   id: string;
@@ -44,6 +92,30 @@ export type InventoryItem = {
 };
 
 export type EquipmentItem = {
+  id: string;
+  name: string;
+};
+
+export type Item = {
+  id: number;
+  name: string;
+  description: string;
+  type: string;
+};
+
+export type InventoryLoadoutItem = {
+  inventoryId: number;
+  amount: number;
+  item: Item;
+};
+
+export type Loadout = {
+  inventoryId: number;
+  equippedItems: (Item | null)[];
+  itemsInInventory: InventoryLoadoutItem[];
+};
+
+export type Racedetails = {
   id: string;
   name: string;
 };

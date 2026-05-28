@@ -81,13 +81,13 @@ class CharacterServiceIntegrationTests {
     static Stream<CreateCharacterRequestDTO> CreateRequestParameters() {
         return Stream.of(
             // P1
-            new CreateCharacterRequestDTO(4, 1, 1, 1, "Bobby"),
+            new CreateCharacterRequestDTO( 1, 1, 1, "Bobby"),
             // P3
-            new CreateCharacterRequestDTO(4, null, null, 1, "Bobby"),
+            new CreateCharacterRequestDTO( null, null, 1, "Bobby"),
             // P7
-            new CreateCharacterRequestDTO(4, 1, null, 1, "Bobby"),
+            new CreateCharacterRequestDTO( 1, null, 1, "Bobby"),
             // P8
-            new CreateCharacterRequestDTO(4, null, 2, 1, "Bobby")
+            new CreateCharacterRequestDTO( null, 2, 1, "Bobby")
         );
     }
 
@@ -97,7 +97,6 @@ class CharacterServiceIntegrationTests {
     ) {
         // Arrange
         CreateCharacterRequestDTO verificationrequest = new CreateCharacterRequestDTO(
-            request.getAccountId(), 
             request.getChapterId(), 
             request.getSceneId(), 
             request.getRaceDetailsId(), 
@@ -105,11 +104,11 @@ class CharacterServiceIntegrationTests {
             //Used to verify the original data
 
         // Act
-        CharacterResponseDTO characterResponse = characterService.createCharacter(request);
+        CharacterResponseDTO characterResponse = characterService.createCharacter(4, request);
 
         // Assert
         assertNotNull(characterResponse);
-        assertEquals(characterResponse.getAccountId(), verificationrequest.getAccountId());
+        assertEquals(characterResponse.getAccountId(), 4);
         if (verificationrequest.getChapterId() != null && verificationrequest.getSceneId() != null) {
             assertEquals(characterResponse.getChapterId(), verificationrequest.getChapterId());
             assertEquals(characterResponse.getSceneId(), verificationrequest.getSceneId());
@@ -137,43 +136,43 @@ class CharacterServiceIntegrationTests {
         return Stream.of(
             // P4
             new CreateRequestParameters(
-                new CreateCharacterRequestDTO(4, 99999, 99999, 99999, "Bobby"),
+                new CreateCharacterRequestDTO( 99999, 99999, 99999, "Bobby"),
                 ResourceNotFoundException.class,
                 "Chapter not found with id: 99999"
             ),
             // P9
             new CreateRequestParameters(
-                new CreateCharacterRequestDTO(4, 99999, 1, 99999, "Bobby"),
+                new CreateCharacterRequestDTO( 99999, 1, 99999, "Bobby"),
                 ResourceNotFoundException.class,
                 "Chapter not found with id: 99999"
             ),
             // P10
             new CreateRequestParameters(
-                new CreateCharacterRequestDTO(4, 1, 99999, 99999, "Bobby"),
+                new CreateCharacterRequestDTO( 1, 99999, 99999, "Bobby"),
                 ResourceNotFoundException.class,
                 "Race details not found with id: 99999"
             ),
             // P11
             new CreateRequestParameters(
-                new CreateCharacterRequestDTO(4, null, null, null, "Bobby"),
+                new CreateCharacterRequestDTO( null, null, null, "Bobby"),
                 InvalidDataAccessApiUsageException.class,
                 "The given id must not be null"
             ),
             // P12
             new CreateRequestParameters(
-                new CreateCharacterRequestDTO(4, 1, null, null, "Bobby"),
+                new CreateCharacterRequestDTO( 1, null, null, "Bobby"),
                 InvalidDataAccessApiUsageException.class,
                 "The given id must not be null"
             ),
             // P13
             new CreateRequestParameters(
-                new CreateCharacterRequestDTO(4, 1, 1, null, "Bobby"),
+                new CreateCharacterRequestDTO( 1, 1, null, "Bobby"),
                 InvalidDataAccessApiUsageException.class,
                 "The given id must not be null"
             ),
             // P14
             new CreateRequestParameters(
-                new CreateCharacterRequestDTO(4, 99999, 99999, 1, "Bobby"),
+                new CreateCharacterRequestDTO( 99999, 99999, 1, "Bobby"),
                 ResourceNotFoundException.class,
                 "Chapter not found with id: 99999"
             )
@@ -188,7 +187,7 @@ class CharacterServiceIntegrationTests {
         CreateCharacterRequestDTO request = params.request();
 
         // Act + Assert
-        assertThatThrownBy(() -> characterService.createCharacter(request))
+        assertThatThrownBy(() -> characterService.createCharacter(4, request))
             .isInstanceOf(params.exceptionToVerify())
             .hasMessageContaining(params.exceptionMessage());        
     }
@@ -293,10 +292,9 @@ class CharacterServiceIntegrationTests {
 
     private CharacterResponseDTO getCreateResponseDTO(Integer accountId) {
         CreateCharacterRequestDTO createDTO = new CreateCharacterRequestDTO();
-        createDTO.setAccountId(accountId);
         createDTO.setRaceDetailsId(1);
         createDTO.setName("benny");
-        return characterService.createCharacter(createDTO);
+        return characterService.createCharacter(accountId, createDTO);
     }
 }
 

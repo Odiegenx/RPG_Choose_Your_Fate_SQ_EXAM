@@ -131,7 +131,7 @@ class CharacterServiceUnitTests {
         return Stream.of(
                 //P2
                 new CreateRequestParametersWithException(
-                    new CreateCharacterRequestDTO(4,1, 2, null, "Bobby"),
+                    new CreateCharacterRequestDTO(1, 2, null, "Bobby"),
                     false,
                     true,
                     true,
@@ -178,7 +178,7 @@ class CharacterServiceUnitTests {
         }
 
          // Act + Assert
-        assertThatThrownBy(() -> characterService.createCharacter(request))
+        assertThatThrownBy(() -> characterService.createCharacter(4, request))
             .isInstanceOf(params.exceptionToVerify())
             .hasMessageContaining(params.exceptionMessage());
     }
@@ -188,7 +188,7 @@ class CharacterServiceUnitTests {
         return Stream.of(
                 //P5
                 new CreateRequestParametersWithException(
-                    new CreateCharacterRequestDTO(4,null, null, 1, "Bobby"),
+                    new CreateCharacterRequestDTO(null, null, 1, "Bobby"),
                     false,
                     true,
                     true,
@@ -201,7 +201,7 @@ class CharacterServiceUnitTests {
 
                 //P6
                 new CreateRequestParametersWithException(
-                    new CreateCharacterRequestDTO(4,null, null, 1, "Bobby"),
+                    new CreateCharacterRequestDTO(null, null, 1, "Bobby"),
                     false,
                     true,
                     true,
@@ -260,7 +260,7 @@ class CharacterServiceUnitTests {
         }
 
          // Act + Assert
-        assertThatThrownBy(() -> characterService.createCharacter(request))
+        assertThatThrownBy(() -> characterService.createCharacter(4, request))
             .isInstanceOf(params.exceptionToVerify())
             .hasMessageContaining(params.exceptionMessage());
     }

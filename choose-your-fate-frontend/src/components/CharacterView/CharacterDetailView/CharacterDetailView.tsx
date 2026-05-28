@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Props, InventoryItem, EquipmentItem } from "../../../types/general";
+import type { CharacterDetailViewProps, InventoryLoadoutItem, Item, Loadout } from "../../../types/general";
 import { apiGet } from "../../../api/authApi";
 
 import InventoryView from "./InventoryView/InventoryView";
@@ -8,9 +8,9 @@ import EquipmentView from "./EquipmentView/EquipmentView";
 import "./CharacterDetailView.css";
 import { useAuth } from "../../../context/AuthContext";
 
-export default function CharacterDetailView({ character }: Props) {
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [equipment, setEquipment] = useState<EquipmentItem[]>([]);
+export default function CharacterDetailView({ character }: CharacterDetailViewProps) {
+  const [inventory, setInventory] = useState<InventoryLoadoutItem[]>([]);
+  const [equipment, setEquipment] = useState<(Item | null)[]>([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
 
@@ -19,13 +19,10 @@ export default function CharacterDetailView({ character }: Props) {
       try {
         setLoading(true);
 
-        const [inventoryData, equipmentData] = await Promise.all([
-          apiGet(`character/${character.id}/inventory`, {token: token}),
-          apiGet(`character/${character.id}/equipment`, {token: token})
-        ]);
+        const loadoutData: Loadout = await apiGet(`loadout/${character.characterId}`, {token: token});
 
-        setInventory(inventoryData);
-        setEquipment(equipmentData);
+        setInventory(loadoutData.itemsInInventory);
+        setEquipment(loadoutData.equippedItems);
 
       } catch (err) {
         console.error(err);
@@ -35,10 +32,10 @@ export default function CharacterDetailView({ character }: Props) {
       }
     }
 
-    if (character?.id) {
+    if (character?.characterId) {
       fetchData();
     }
-  }, [character]);
+  }, [character, token]);
 
   if (loading) {
     return <div>Loading character details...</div>;
@@ -56,7 +53,19 @@ export default function CharacterDetailView({ character }: Props) {
                     <EquipmentView equipment={equipment} />
                 </div>
                 <div id="character-detail-grid-portrait" className="border">
-                    {character.name}
+                    
+                    <p>Name: {character.characterName}</p>
+                    <br />
+                    <p>Race: {character.raceName}</p>
+                    <br />
+                    <p>Current chapter: {character.chapterName}</p>
+                    <br />
+                    <p>Intelligence: {character.stats.intelligence}</p>
+                    <br />
+                    <p>Charisma: {character.stats.charisma}</p>
+                    <br />
+                    <p>Fashion: {character.stats.fashion}</p>
+                    <br />
                 </div>
             </div>
 

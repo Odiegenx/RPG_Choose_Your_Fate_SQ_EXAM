@@ -28,7 +28,7 @@ export async function register(username: string, email: string, password: string
   return res.json();
 }
 
-export async function apiGet(apiPath: String, options?: { token: string | null }) {
+export async function apiGet(apiPath: string, options?: { token: string | null }) {
   const res = await fetch(`${API_URL}choose-your-fate/${apiPath}`, {
     method: "GET",
     headers: { 
@@ -40,6 +40,28 @@ export async function apiGet(apiPath: String, options?: { token: string | null }
 
   if (!res.ok) {
     throw new Error("Login failed");
+  }
+
+  return res.json();
+}
+
+export async function apiPost(
+  apiPath: string,
+  body: unknown,
+  options?: { token: string | null }
+) {
+  const res = await fetch(`${API_URL}choose-your-fate/${apiPath}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${options ? options.token : null}`,
+      "X-Data-Source": "SQL",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    throw new Error("Request failed");
   }
 
   return res.json();

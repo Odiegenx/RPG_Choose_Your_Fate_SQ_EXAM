@@ -1,24 +1,26 @@
 import { useEffect, useState } from "react";
 import { apiGet } from "../../../api/authApi";
-import type { Character, CharacterListProps } from "../../../types/general";
+import type { CharacterView, CharacterListProps, CharacterViewResponse } from "../../../types/general";
 import CharacterWindow from "./CharacterWindow/CharacterWindow";
 import NewCharacterWindow from "./NewCharacterWindow/NewCharacterWindow";
 
 import "./CharacterList.css"
 import { useAuth } from "../../../context/AuthContext";
 
-export default function CharacterList({ onSelect }: CharacterListProps) {
-  const [characters, setCharacters] = useState<Character[]>([]);
+export default function CharacterList({ onSelect, refreshKey }: CharacterListProps) {
+  const [characters, setCharacters] = useState<CharacterView[]>([]);
+  const [canCreateMoreCharacters, setCanCreateMoreCharacters] = useState(false);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
 
   useEffect(() => {
     async function fetchCharacters() {
       try {
-        const data: Character[] = await apiGet(`characters/all`, {token: token});
+        const data: CharacterViewResponse = await apiGet(`characters/all/view`, {token: token});
         
 
-        setCharacters(data);
+        setCharacters(data.views);
+        setCanCreateMoreCharacters(data.canCreateMoreCharacters);
       } catch (err) {
         console.error(err);
         alert("Failed to load character");
@@ -28,7 +30,7 @@ export default function CharacterList({ onSelect }: CharacterListProps) {
     }
 
     fetchCharacters();
-  }, []);
+  }, [token, refreshKey]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -37,9 +39,11 @@ export default function CharacterList({ onSelect }: CharacterListProps) {
   return (
     <div id="character-list-view">
       {characters.map((character) => (
-        <CharacterWindow key={character.id} character={character} onSelect={onSelect} />
+        <CharacterWindow key={character.characterId} character={character} onSelect={onSelect} />
       ))}
-      <NewCharacterWindow />
+      {canCreateMoreCharacters && (
+        <NewCharacterWindow onSelect={onSelect} />
+      )}
     </div>
   );
 }

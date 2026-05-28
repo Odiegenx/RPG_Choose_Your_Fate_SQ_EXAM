@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/character-paths")
+@RequestMapping("/choose-your-fate/character-paths")
 public class CharacterPathController {
     private final CharacterPathService characterPathService;
     private final TTSService ttsService;

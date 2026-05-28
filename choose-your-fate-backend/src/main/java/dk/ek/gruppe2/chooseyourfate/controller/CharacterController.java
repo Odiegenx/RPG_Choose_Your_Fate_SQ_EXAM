@@ -3,6 +3,7 @@ package dk.ek.gruppe2.chooseyourfate.controller;
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CharacterViewResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.CreateCharacterRequestDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.MultipleCharacterViewsResponseDto;
 import dk.ek.gruppe2.chooseyourfate.service.CharacterService;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,21 +40,28 @@ public class CharacterController {
     }
 
     // Returns the character screen view with character, chapter, race, stats, and creation-limit info together.
-    @GetMapping("/{id}/view")
-    @PreAuthorize("hasRole('ADMIN') or @characterAuthorizationService.canAccessCharacter(#id, authentication)")
-    public CharacterViewResponseDTO getCharacterViewById(
-            @RequestHeader(value = DATA_SOURCE_HEADER, required = true) DataSourceType dataSource,
-            @PathVariable Integer id
+    @GetMapping("/all/view")
+    @PreAuthorize("hasRole('ADMIN') or @accountAuthorizationService.canModifyAccount(authentication)")
+    public MultipleCharacterViewsResponseDto getCharacterViewById(
+        Authentication auth
     ) {
-        return characterService.getCharacterViewById(dataSource, id);
+        Map<String, Object> extraInfo =  (Map<String, Object>) auth.getDetails(); 
+
+        Integer accountId = Integer.parseInt(extraInfo.get("sqlId").toString());
+
+        return characterService.getCharactersViewBy_AccountId(accountId);
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or @accountAuthorizationService.canModifyAccount(#request.accountId, authentication)")
+    @PreAuthorize("hasRole('ADMIN') or @accountAuthorizationService.canModifyAccount(authentication)")
     public CharacterResponseDTO createCharacter(
-            @RequestBody CreateCharacterRequestDTO request
+            @RequestBody CreateCharacterRequestDTO request,
+            Authentication auth
     ) {
-        return characterService.createCharacter(request);
+        Map<String, Object> extraInfo =  (Map<String, Object>) auth.getDetails(); 
+
+        Integer accountId = Integer.parseInt(extraInfo.get("sqlId").toString());
+        return characterService.createCharacter(accountId, request);
     }
 
     @DeleteMapping("/{id}")
@@ -70,7 +78,7 @@ public class CharacterController {
     ) {
         Map<String, Object> extraInfo =  (Map<String, Object>) auth.getDetails(); 
 
-        Object accountId = extraInfo.get("sqlId");
+        Integer accountId = Integer.parseInt(extraInfo.get("sqlId").toString());
 
         return characterService.getCharactersByAccountId(Integer.parseInt(accountId.toString()));
     }

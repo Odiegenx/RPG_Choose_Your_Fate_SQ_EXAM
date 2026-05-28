@@ -1,11 +1,13 @@
-import type { InventoryItem } from "../../../../types/general";
+import type { InventoryLoadoutItem } from "../../../../types/general";
 
-export default function InventoryView({ inventory }: { inventory: InventoryItem[] }) {
+export default function InventoryView({ inventory }: { inventory: InventoryLoadoutItem[] }) {
   return (
     <div>
       <h3>Inventory</h3>
-      {inventory.map((item) => (
-        <div key={item.id} title={item.name}>{item.name}</div>
+      {inventory.map((inventoryItem) => (
+        <div key={inventoryItem.item.id} title={inventoryItem.item.description}>
+          {inventoryItem.item.name} x{inventoryItem.amount}
+        </div>
       ))}
     </div>
   );

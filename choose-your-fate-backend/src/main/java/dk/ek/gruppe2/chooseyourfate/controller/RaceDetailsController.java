@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/race-details")
+@RequestMapping("/choose-your-fate/race-details")
 public class RaceDetailsController {
 
     private static final String DATA_SOURCE_HEADER = "X-Data-Source";
