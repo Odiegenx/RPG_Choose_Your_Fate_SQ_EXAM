@@ -40,7 +40,8 @@ INSERT INTO account (id, username, character_limit, email, password, role) VALUE
     (1, 'astra', 3, 'astra@chooseyourfate.dk', '$2b$10$Ruvc2k.FR5tK3GDvs2wU5OuIxZ/MBpvdCt.yPyYcQ9IQ5VVMX/08C', 'ROLE_USER'),
     (2, 'bjorn', 3, 'bjorn@chooseyourfate.dk', '$2b$10$JTD7.poDApqumMdqEb.hlODpLI/QVx2T1U7EYlE8prUm6XpabmU1G', 'ROLE_USER'),
     (3, 'cora', 2, 'cora@chooseyourfate.dk', '$2b$10$iZ9YNxMMbTNypAe9bbc9iO2Gx6Vry//6EvkvaqzoaOQeZkslRQl42', 'ROLE_USER'),
-    (4, 'admin', 5, 'admin@chooseyourfate.dk', '$2b$10$oRncOoF8dWCtNtBanr/NxOVzSrK5ZxyHZthp9CIzo44W3fKgS..sK', 'ROLE_ADMIN');
+    (4, 'admin', 9999, 'admin@chooseyourfate.dk', '$2b$10$oRncOoF8dWCtNtBanr/NxOVzSrK5ZxyHZthp9CIzo44W3fKgS..sK', 'ROLE_ADMIN'),
+    (5, 'bobby', 9999, 'bobby@chooseyourfate.dk', '$2b$10$oRncOoF8dWCtNtBanr/NxOVzSrK5ZxyHZthp9CIzo44W3fKgS..sK', 'ROLE_USER');
 
 INSERT INTO chapter (id, name, starting_scene_id) VALUES
     (1, 'The Festival Gate', NULL),
