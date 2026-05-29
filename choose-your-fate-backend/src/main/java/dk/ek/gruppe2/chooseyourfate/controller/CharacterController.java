@@ -80,6 +80,6 @@ public class CharacterController {
 
         Integer accountId = Integer.parseInt(extraInfo.get("sqlId").toString());
 
-        return characterService.getCharactersByAccountId(Integer.parseInt(accountId.toString()));
+        return characterService.getCharactersByAccountId(accountId);
     }
 }
