@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiGet, apiPut } from "../api/authApi";
 import { ShowDialog } from "../components/ShowDialog/ShowDialog";
 import { useAuth } from "../context/AuthContext";
-import type { Character, Scene, SceneLookaheadResponse } from "../types/general";
+import type { Character, ChoiceResponse, Scene, SceneLookaheadResponse, SceneResponse } from "../types/general";
 
-function toDialogScene(lookahead: SceneLookaheadResponse): Scene {
+function toDialogScene(scene: SceneResponse, choices: ChoiceResponse[] = []): Scene {
     return {
-        id: lookahead.scene.id,
-        dialog: [lookahead.scene.name],
+        id: scene.id,
+        dialog: [scene.name],
         img: "/images/Welcome.png",
-        choices: lookahead.choices.map((choice) => ({
+        choices: choices.map((choice) => ({
             id: choice.id,
             name: choice.description,
             destination_id: choice.destinationSceneId
@@ -17,15 +17,23 @@ function toDialogScene(lookahead: SceneLookaheadResponse): Scene {
     };
 }
 
+function sceneIdsMatch(left: string | number, right: string | number) {
+    return left.toString() === right.toString();
+}
+
 export default function Game() {
     const { token, loading: authLoading } = useAuth();
     const [scene, setScene] = useState<Scene | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const lookaheadRef = useRef<SceneLookaheadResponse | null>(null);
+    const activeLookaheadRequest = useRef(0);
 
-    async function loadScene(sceneId: number | string) {
+    async function loadLookahead(sceneId: number | string) {
         const lookahead: SceneLookaheadResponse = await apiGet(`scene/${sceneId}/lookahead`, { token });
-        setScene(toDialogScene(lookahead));
+        lookaheadRef.current = lookahead;
+        setScene(toDialogScene(lookahead.scene, lookahead.choices));
+        return lookahead;
     }
 
     useEffect(() => {
@@ -46,7 +54,7 @@ export default function Game() {
                 setLoading(true);
                 setError(null);
                 const character: Character = await apiGet(`characters/${characterId}`, { token });
-                await loadScene(character.sceneId);
+                await loadLookahead(character.sceneId);
             } catch (err) {
                 console.error(err);
                 setError("Failed to load game.");
@@ -58,7 +66,21 @@ export default function Game() {
         loadCharacterScene();
     }, [authLoading, token]);
 
-    async function goTo(sceneId: string | number, choiceId: string | number) {
+    async function prefetchLookahead(sceneId: string | number) {
+        const requestId = activeLookaheadRequest.current + 1;
+        activeLookaheadRequest.current = requestId;
+
+        const lookahead: SceneLookaheadResponse = await apiGet(`scene/${sceneId}/lookahead`, { token });
+
+        if (activeLookaheadRequest.current !== requestId) {
+            return;
+        }
+
+        lookaheadRef.current = lookahead;
+        setScene(toDialogScene(lookahead.scene, lookahead.choices));
+    }
+
+    async function goTo(destinationSceneId: string | number, choiceId: string | number) {
         const characterId = localStorage.getItem("characterId");
 
         if (!characterId) {
@@ -67,10 +89,30 @@ export default function Game() {
         }
 
         try {
-            setLoading(true);
             setError(null);
-            await apiPut(`character-paths/${characterId}/chosen/${choiceId}`, undefined, { token });
-            await loadScene(sceneId);
+            const destinationScene = lookaheadRef.current?.destinationScenes.find((scene) =>
+                sceneIdsMatch(scene.id, destinationSceneId)
+            );
+
+            if (destinationScene) {
+                setScene(toDialogScene(destinationScene));
+            } else {
+                setLoading(true);
+            }
+
+            const [choiceResult, lookaheadResult] = await Promise.allSettled([
+                apiPut(`character-paths/${characterId}/chosen/${choiceId}`, undefined, { token }),
+                prefetchLookahead(destinationSceneId)
+            ]);
+
+            if (choiceResult.status === "rejected") {
+                throw choiceResult.reason;
+            }
+
+            if (lookaheadResult.status === "rejected") {
+                console.error(lookaheadResult.reason);
+                alert("Scene loaded, but the next choices failed to load. Please try again.");
+            }
         } catch (err) {
             console.error(err);
             alert("Choice failed. Please try again.");
