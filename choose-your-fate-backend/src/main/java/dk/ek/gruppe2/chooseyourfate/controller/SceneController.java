@@ -2,7 +2,7 @@ package dk.ek.gruppe2.chooseyourfate.controller;
 
 import java.util.List;
 
-import dk.ek.gruppe2.chooseyourfate.service.SceneService;
+import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneLookaheadResponseDTO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import dk.ek.gruppe2.chooseyourfate.dto.scene.CreateSceneRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.scene.UpdateSceneRequestDTO;
+import dk.ek.gruppe2.chooseyourfate.enums.DataSourceType;
+import dk.ek.gruppe2.chooseyourfate.service.SceneService;
 
 
 @RestController
@@ -30,8 +32,7 @@ public class SceneController {
     }
 
     @GetMapping
-    public List<SceneResponseDTO> getAllscenes(
-    ) {
+    public List<SceneResponseDTO> getAllscenes() {
         return sceneService.getAllScenes();
     }
 
@@ -66,4 +67,12 @@ public class SceneController {
     ) {
         sceneService.deleteScene(id);
     }
+
+    @GetMapping("/{id}/lookahead")
+    public SceneLookaheadResponseDTO getSceneLookahead(
+            @PathVariable Integer id
+    ) {
+        return sceneService.getSceneLookahead(id);
+    }
+
 }

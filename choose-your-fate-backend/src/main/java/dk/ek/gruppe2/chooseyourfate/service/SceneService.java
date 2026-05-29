@@ -1,5 +1,6 @@
 package dk.ek.gruppe2.chooseyourfate.service;
 
+import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneLookaheadResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.scene.SceneResponseDTO;
 
 import java.util.List;
@@ -24,13 +25,15 @@ public class SceneService {
         this.chapterRepository = chapterRepository;
     }
 
+    // Returns all SQL scenes with one-scene lookahead choices included.
     public List<SceneResponseDTO> getAllScenes() {
-        return sceneRepository.findAll()
+        return sceneRepository.findAllWithLookAhead()
                 .stream()
                 .map(SceneResponseDTO::new)
                 .toList();
     }
 
+    // Returns one SQL scene with the choices and destination scenes already loaded.
     public SceneResponseDTO getSceneById(Integer id) {
         return new SceneResponseDTO(getSceneEntity(id));
     }
@@ -55,12 +58,16 @@ public class SceneService {
     }
 
     private Scene getSceneEntity(Integer id) {
-        return sceneRepository.findById(id)
+        return sceneRepository.findByIdWithLookAhead(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Scene not found with id: " + id));
     }
 
     private Chapter getChapterById(Integer chapterId){
         return chapterRepository.findById(chapterId)
-            .orElseThrow(() -> new ResourceNotFoundException("Chapter not found with id: " + chapterId));
+                .orElseThrow(() -> new ResourceNotFoundException("Chapter not found with id: " + chapterId));
+    }
+
+    public SceneLookaheadResponseDTO getSceneLookahead(Integer id) {
+        return new SceneLookaheadResponseDTO(getSceneEntity(id));
     }
 }
