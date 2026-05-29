@@ -2,6 +2,7 @@ package dk.ek.gruppe2.chooseyourfate.unit;
 
 import dk.ek.gruppe2.chooseyourfate.dto.choice.ChoiceResponseDTO;
 import dk.ek.gruppe2.chooseyourfate.dto.choice.CreateChoiceRequestDTO;
+import dk.ek.gruppe2.chooseyourfate.dto.choice.UpdateChoiceRequestDTO;
 import dk.ek.gruppe2.chooseyourfate.exception.ResourceNotFoundException;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Chapter;
 import dk.ek.gruppe2.chooseyourfate.model.mysql.Choice;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -46,6 +48,7 @@ class ChoiceServiceTest {
     private Choice enterMarketChoice;
     private Choice climbWatchtowerChoice;
     private CreateChoiceRequestDTO createChoiceRequest;
+    private UpdateChoiceRequestDTO updateChoiceRequest;
 
     @BeforeEach
     void setUp() {
@@ -87,6 +90,16 @@ class ChoiceServiceTest {
         createChoiceRequest.setValueInt(1);
         createChoiceRequest.setStoryWeight((short) 8);
         createChoiceRequest.setRequirements("{\"requires\":[],\"grants\":[\"festival-access\"]}");
+
+        updateChoiceRequest = new UpdateChoiceRequestDTO();
+        updateChoiceRequest.setSceneId(1);
+        updateChoiceRequest.setDestinationSceneId(2);
+        updateChoiceRequest.setDescription("Take the festival road toward the market.");
+        updateChoiceRequest.setConsequence("gain_stat");
+        updateChoiceRequest.setTargetId(2);
+        updateChoiceRequest.setValueInt(2);
+        updateChoiceRequest.setStoryWeight((short) 5);
+        updateChoiceRequest.setRequirements("{\"requires\":[\"festival-access\"]}");
     }
 
     @AfterEach
@@ -94,6 +107,7 @@ class ChoiceServiceTest {
         verifyNoMoreInteractions(choiceRepository, sceneRepository);
     }
 
+    // Checks that an existing choice is fetched and mapped to a response DTO.
     @Test
     void getChoiceByIdReturnsChoiceMappedFromRepositoryEntity() {
         when(choiceRepository.findById(1)).thenReturn(Optional.of(enterMarketChoice));
@@ -111,6 +125,7 @@ class ChoiceServiceTest {
         verify(choiceRepository).findById(1);
     }
 
+    // Checks that a missing choice ID throws the expected not-found exception.
     @Test
     void getChoiceByIdThrowsResourceNotFoundWhenChoiceDoesNotExist() {
         when(choiceRepository.findById(0)).thenReturn(Optional.empty());
@@ -124,6 +139,7 @@ class ChoiceServiceTest {
         verify(choiceRepository).findById(0);
     }
 
+    // Checks that all repository choices are mapped into response DTOs.
     @Test
     void getAllChoicesReturnsMappedChoicesFromRepositoryEntities() {
         when(choiceRepository.findAll()).thenReturn(List.of(enterMarketChoice, climbWatchtowerChoice));
@@ -138,6 +154,7 @@ class ChoiceServiceTest {
         verify(choiceRepository).findAll();
     }
 
+    // Checks that a valid create request builds a Choice, saves it, and returns the saved DTO.
     @Test
     void createChoiceBuildsChoiceFromRequestAndSavesIt() {
         when(sceneRepository.findById(1)).thenReturn(Optional.of(townGate));
@@ -167,6 +184,70 @@ class ChoiceServiceTest {
         assertEquals("2", actual.getDestinationSceneId());
         verify(sceneRepository).findById(1);
         verify(sceneRepository).findById(2);
+    }
+
+    // Checks that creating a choice fails when the source scene cannot be found.
+    @Test
+    void createChoiceThrowsResourceNotFoundWhenSourceSceneDoesNotExist() {
+        createChoiceRequest.setSceneId(0);
+        when(sceneRepository.findById(0)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> choiceService.createChoice(createChoiceRequest)
+        );
+
+        assertEquals("Scene not found with id: 0", exception.getMessage());
+        verify(sceneRepository).findById(0);
+        verify(choiceRepository, never()).save(any(Choice.class));
+    }
+
+    // Checks that creating a choice fails when the destination scene cannot be found.
+    @Test
+    void createChoiceThrowsResourceNotFoundWhenDestinationSceneDoesNotExist() {
+        createChoiceRequest.setDestinationSceneId(99);
+        when(sceneRepository.findById(1)).thenReturn(Optional.of(townGate));
+        when(sceneRepository.findById(99)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> choiceService.createChoice(createChoiceRequest)
+        );
+
+        assertEquals("Scene not found with id: 99", exception.getMessage());
+        verify(sceneRepository).findById(1);
+        verify(sceneRepository).findById(99);
+        verify(choiceRepository, never()).save(any(Choice.class));
+    }
+
+    // Checks that updating a missing choice fails before anything is saved.
+    @Test
+    void updateChoiceThrowsResourceNotFoundWhenChoiceDoesNotExist() {
+        when(choiceRepository.findById(0)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> choiceService.updateChoice(0, updateChoiceRequest)
+        );
+
+        assertEquals("Choice not found with id: 0", exception.getMessage());
+        verify(choiceRepository).findById(0);
+        verify(choiceRepository, never()).save(any(Choice.class));
+    }
+
+    // Checks that deleting a missing choice fails before deleteById is called.
+    @Test
+    void deleteChoiceThrowsResourceNotFoundWhenChoiceDoesNotExist() {
+        when(choiceRepository.existsById(0)).thenReturn(false);
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> choiceService.deleteChoice(0)
+        );
+
+        assertEquals("Choice not found with id: 0", exception.getMessage());
+        verify(choiceRepository).existsById(0);
+        verify(choiceRepository, never()).deleteById(0);
     }
 
     private Scene scene(Integer id, String name, Chapter chapter) {
