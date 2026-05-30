@@ -4,7 +4,10 @@ on:
     workflows: ["Java CI with Maven"]
     types:
       - completed
+  push:
+    branches: [ main, master ]
   workflow_dispatch:
+
 jobs:
   test:
     timeout-minutes: 60
