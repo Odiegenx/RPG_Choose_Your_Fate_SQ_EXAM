@@ -952,7 +952,11 @@ INSERT INTO choice_has_item (choice_id, item_id) VALUES
 INSERT INTO character_avatar (id, account_id, chapter_id, scene_id, race_detail_id, name, flag) VALUES
     (1, 1, 1, 1, 1, 'Lyra', '{"reputation":{"guard":1},"statusEffects":[],"storyFlags":["festival-access"]}'),
     (2, 2, 1, 1, 2, 'Torben', '{"reputation":{"market":0},"statusEffects":[],"storyFlags":["watchtower-visited"]}'),
-    (3, 3, 5, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}');
+    (3, 3, 5, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}'),
+    (4, 4, 5, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}'),
+    (5, 4, 5, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}'),
+    (6, 4, 5, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}'),
+    (7, 4, 5, 5, 3, 'Mira', '{"reputation":{"archive":2},"statusEffects":[],"storyFlags":["shrine-open"]}');
 
 
 UPDATE character_details
@@ -968,16 +972,53 @@ SET intelligence = 9, charisma = 8, fashion = 6
 WHERE character_id = 3;
 
 UPDATE character_path
-SET summary = 'Lyra entered through the gate and started uncovering the mystery behind the moon shrine.'
+SET summary = 'YOYOY' -- Should not be longer as it would use too many tokens for the tests.
+--SET audio_blob = NULL
+, summary_updated_at = "2026-05-30T22:27:06"
+--SET audio_blob_updated_at = NULL
 WHERE character_id = 1;
 
 UPDATE character_path
-SET summary = 'Torben prefers scouting from high ground before taking risks.'
+SET summary = '' --Has to be empty for a test in Text to speech
+--SET audio_blob = NULL
+--SET summary_updated_at = NULL
+--SET audio_blob_updated_at = NULL
 WHERE character_id = 2;
 
 UPDATE character_path
-SET summary = 'Mira has already reached the shrine and is close to resolving the archive questline.'
+SET summary = NULL --Has to be null for a test in Text to speech
+--SET audio_blob = NULL
+--SET summary_updated_at = NULL
+--SET audio_blob_updated_at = NULL
 WHERE character_id = 3;
+
+UPDATE character_path --outdated blob
+SET summary = 'YOYOY' -- Should not be longer as it would use too many tokens for the tests.
+, audio_blob = X'48656C6C6F' --false blob data it is a byte array, but it is not an audio file 
+, summary_updated_at = "2026-05-30T22:27:06"
+, audio_blob_updated_at = "2026-05-29T22:27:06"
+WHERE character_id = 4;
+
+UPDATE character_path --up to date blob
+SET summary = 'YOYOY' -- Should not be longer as it would use too many tokens for the tests.
+, audio_blob = X'48656C6C6F' --false blob data it is a byte array, but it is not an audio file 
+, summary_updated_at = "2026-05-30T22:27:06"
+, audio_blob_updated_at = "2026-05-30T22:28:06"
+WHERE character_id = 5;
+
+UPDATE character_path --up to date blob and no summary
+SET summary = '' -- Should not be longer as it would use too many tokens for the tests.
+, audio_blob = X'48656C6C6F' --false blob data it is a byte array, but it is not an audio file 
+--, summary_updated_at = "2026-05-30T22:27:06"
+, audio_blob_updated_at = "2026-05-30T22:27:06"
+WHERE character_id = 6;
+
+UPDATE character_path --up to date blob and no summary
+SET summary = 'YOYOY' -- Should not be longer as it would use too many tokens for the tests.
+, audio_blob = X'48656C6C6F' --false blob data it is a byte array, but it is not an audio file 
+, summary_updated_at = "2026-05-30T22:27:06"
+, audio_blob_updated_at = "2026-05-29T22:27:06"
+WHERE character_id = 7;
 
 INSERT INTO character_has_quest (character_id, quest_id, status) VALUES
     (1, 1, 0),
@@ -1322,7 +1363,7 @@ SELECT
         'storyFlags', JSON_ARRAY(CONCAT('origin-', LPAD(((n - 4) % 98) + 1, 3, '0')))
     )
 FROM tmp_seq_100
-WHERE n BETWEEN 4 AND 100;
+WHERE n BETWEEN 8 AND 100;
 
 UPDATE character_details cd
 JOIN character_avatar ca ON ca.id = cd.character_id
@@ -1405,7 +1446,7 @@ SET cp.summary = CONCAT(
     LPAD(ca.scene_id, 3, '0'),
     ' while balancing faction ties and personal survival.'
 )
-WHERE ca.id BETWEEN 4 AND 100;
+WHERE ca.id BETWEEN 8 AND 100;
 
 DROP TEMPORARY TABLE IF EXISTS tmp_seq_100;
 
