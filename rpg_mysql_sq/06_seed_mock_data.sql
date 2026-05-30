@@ -21,7 +21,7 @@ SELECT n
 FROM seq;
 
 -- ---------------------------------------------------------------------------
--- Accounts (4 existing -> add 96)
+-- Accounts (5 existing -> add 96)
 -- ---------------------------------------------------------------------------
 INSERT INTO account (id, username, character_limit, email, password, role)
 SELECT
@@ -35,7 +35,7 @@ SELECT
         ELSE 'ROLE_USER'
     END
 FROM tmp_seq_100
-WHERE n BETWEEN 5 AND 100;
+WHERE n BETWEEN 6 AND 100;
 
 -- ---------------------------------------------------------------------------
 -- Chapters (5 existing -> add 95)
