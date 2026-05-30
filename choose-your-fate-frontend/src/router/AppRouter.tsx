@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "../pages/login/login";
-import Register from "../pages/login/register";
+import Login from "../pages/login/Login";
+import Register from "../pages/login/Register";
 import Account from "../pages/Account";
 import Game from "../pages/Game";
 import ProtectedRoute from "../components/ProtectedRoute";

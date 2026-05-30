@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { login } from "../../api/authApi"
-import "./login.css"
+import "./Login.css"
 
 export default function Login() {
   const { updateToken } = useAuth();
