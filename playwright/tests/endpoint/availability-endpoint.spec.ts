@@ -12,22 +12,6 @@ const userHeaders = () => ({ Authorization: `Bearer ${process.env.USER_TOKEN}` }
 // Makes sure the tests run serally, as these tests mutate the gobal routing state on the backend.
 test.describe.configure({mode: 'serial'})
 
-// Helper methord to help bring backend back to PRIMARY_ACTIVE state regardless of current state.
-// async function ensurePrimaryActiveState(request: APIRequestContext): Promise<void> {
-//     const statusResponse = await request.get(process.env.API_URL+rootEndpoint+'/status', { headers: adminHeaders() });
-//     const data = await statusResponse.json();
-//     if(data.state === "PRIMARY_ACTIVE") return;
-//     if(data.state === "SECONDARY_ACTIVE") {
-//         await request.post(process.env.API_URL+rootEndpoint+'/failback/begin',{headers:adminHeaders()});
-//         await request.post(process.env.API_URL+rootEndpoint+'/failback/complete',{headers:adminHeaders()});
-//         return;
-//     }
-//     if (data.state === "FAILBACK_IN_PROGRESS") {
-//         await request.post(process.env.API_URL+rootEndpoint+'/failback/complete',{headers:adminHeaders()});
-//         return;
-//     }
-//     // FAILOVER_IN_PROGRESS cant be recovered via endpoints, wait or restart.
-// }
 
 async function ensurePrimaryActiveState(request: APIRequestContext): Promise<void> {
     const statusResponse = await request.get(
