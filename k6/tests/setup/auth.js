@@ -9,8 +9,8 @@ const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
  */
 export function getToken() {
   const credentials = {
-    username: __ENV.K6_USERNAME,
-    password: __ENV.K6_PASSWORD
+    username: "admin",
+    password: "admin123"
   };
 
   const res = http.post(
