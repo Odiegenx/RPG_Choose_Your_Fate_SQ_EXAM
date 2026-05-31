@@ -39,7 +39,11 @@ test.describe("character-paths Get by characterId endpoint", () => {
             headers: { Authorization: `Bearer ${process.env.ADMIN_TOKEN}` }
         });
         expect(response.status()).toBe(200);
-        expect(await response.json()).not.toBeNull();
+        const data = await response.json()
+        expect(data).not.toBeNull();
+        expect(data.characterId).toBe(adminCharacterId)
+        expect(typeof data.summary).toBe('string');
+        
     });
 
     test('With USER token for own character should return 200', async ({ request }) => {
@@ -47,6 +51,10 @@ test.describe("character-paths Get by characterId endpoint", () => {
             headers: { Authorization: `Bearer ${process.env.USER_TOKEN}` }
         });
         expect(response.status()).toBe(200);
+        const data = await response.json()
+        expect(data).not.toBeNull();
+        expect(data.characterId).toBe(userCharacterId)
+        expect(typeof data.summary).toBe('string');
     });
 
     test('With USER token for another users character should return 403', async ({ request }) => {
@@ -73,19 +81,27 @@ test.describe("character-paths Update endpoint", () => {
     });
 
     test('With ADMIN token should return 200', async ({ request }) => {
+        const newSummary = "test summary " + Math.random().toString(36).substring(2, 10);
         const response = await request.put(process.env.API_URL + rootEndpoint + `/${adminCharacterId}`, {
             headers: { Authorization: `Bearer ${process.env.ADMIN_TOKEN}` },
-            data: { currentChapterId: 1 }
+            data: { summary: newSummary }
         });
         expect(response.status()).toBe(200);
+        const data = await response.json();
+        expect(data.summary).toBe(newSummary);
+        expect(data.characterId).toBe(adminCharacterId);
     });
 
     test('With USER token for own character should return 200', async ({ request }) => {
+        const newSummary = "test summary " + Math.random().toString(36).substring(2, 10);
         const response = await request.put(process.env.API_URL + rootEndpoint + `/${userCharacterId}`, {
             headers: { Authorization: `Bearer ${process.env.USER_TOKEN}` },
-            data: { currentChapterId: 1 }
+            data: { summary: newSummary }
         });
         expect(response.status()).toBe(200);
+        const data = await response.json();
+        expect(data.summary).toBe(newSummary);
+        expect(data.characterId).toBe(userCharacterId);
     });
 
     test('With USER token for another users character should return 403', async ({ request }) => {
@@ -98,8 +114,8 @@ test.describe("character-paths Update endpoint", () => {
 });
 
 test.describe("character-paths Update choices endpoint", () => {
-    let adminSceneId;
-    let userSceneId;
+    let adminSceneId: number;
+    let userSceneId: number;
 
     test.beforeEach(async ({ request }) => {
         const userCharacterResponse = await request.get(process.env.API_URL + `choose-your-fate/characters/${userCharacterId}`, {
@@ -116,26 +132,26 @@ test.describe("character-paths Update choices endpoint", () => {
     });
 
     test('Without token should return 403', async ({ request }) => {
-        const response = await request.put(process.env.API_URL + rootEndpoint + `/${adminCharacterId}/chosen/${adminCharacterId}`);
+        const response = await request.put(process.env.API_URL + rootEndpoint + `/${adminCharacterId}/chosen/${adminSceneId}`);
         expect(response.status()).toBe(403);
     });
 
     test('With ADMIN token should return 200', async ({ request }) => {
-        const response = await request.put(process.env.API_URL + rootEndpoint + `/${adminCharacterId}/chosen/${adminCharacterId}`, {
+        const response = await request.put(process.env.API_URL + rootEndpoint + `/${adminCharacterId}/chosen/${adminSceneId}`, {
             headers: { Authorization: `Bearer ${process.env.ADMIN_TOKEN}` }
         });
         expect(response.status()).toBe(200);
     });
 
     test('With USER token for own character should return 200', async ({ request }) => {
-        const response = await request.put(process.env.API_URL + rootEndpoint + `/${userCharacterId}/chosen/${adminCharacterId}`, {
+        const response = await request.put(process.env.API_URL + rootEndpoint + `/${userCharacterId}/chosen/${userSceneId}`, {
             headers: { Authorization: `Bearer ${process.env.USER_TOKEN}` }
         });
         expect(response.status()).toBe(200);
     });
 
         test('With USER token for another users character should return 403', async ({ request }) => {
-        const response = await request.put(process.env.API_URL + rootEndpoint + `/${adminCharacterId}/chosen/${adminCharacterId}`, {
+        const response = await request.put(process.env.API_URL + rootEndpoint + `/${adminCharacterId}/chosen/${adminSceneId}`, {
             headers: { Authorization: `Bearer ${process.env.USER_TOKEN}` }
         });
         expect(response.status()).toBe(403);
