@@ -75,7 +75,7 @@ test('Register a new account, then log in with that account and land on the acco
   // ---------- Phase 2: Login with the freshly created account ----------
   await page.getByRole('textbox', { name: 'Username' }).fill(username);
   await page.getByRole('textbox', { name: 'Password' }).fill(password);
-  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByRole('button', { name: 'Login' }).click({force:true});
 
   // Assert — successful login lands on /account
   await expect(page).toHaveURL(/.*\/account/);

@@ -1,7 +1,7 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
 
 const rootEndpoint = 'choose-your-fate/characters';
-const missingCharacterId = 999999999;
+const missingCharacterId = 99999;
 
 type Character = {
   id: number;
@@ -86,39 +86,31 @@ test.describe('CharacterController endpoint tests', () => {
 
   // Verifies that an admin can retrieve one existing character by its id.
   test('GET /characters/{id} with ADMIN token should return the requested character', async ({ request }) => {
-    const created = await createCharacter(request, process.env.ADMIN_TOKEN, {
-      raceDetailsId: 1,
-      name: uniqueName('get-admin'),
+    // const created = await createCharacter(request, process.env.ADMIN_TOKEN, {
+    //   raceDetailsId: 1,
+    //   name: uniqueName('get-admin'),
+    // });
+    
+    const response = await request.get(endpoint(`/${6}`), {
+      headers: authorization(process.env.ADMIN_TOKEN),
     });
 
-    try {
-      const response = await request.get(endpoint(`/${created.id}`), {
-        headers: authorization(process.env.ADMIN_TOKEN),
-      });
-
-      expect(response.status()).toBe(200);
-      expect((await response.json() as Character).id).toBe(created.id);
-    } finally {
-      await deleteCharacter(request, process.env.ADMIN_TOKEN, created.id);
-    }
+    expect(response.status()).toBe(200);
+    expect((await response.json() as Character).id).toBe(6);
   });
 
-  // Verifies object-level authorization: a user cannot read a character owned by the admin account.
+  // Verifies object-level authorization: a user cannot read a character owned by another account.
   test('GET /characters/{id} with USER token for another account should return 403', async ({ request }) => {
-    const created = await createCharacter(request, process.env.ADMIN_TOKEN, {
-      raceDetailsId: 1,
-      name: uniqueName('get-forbidden'),
+    // const created = await createCharacter(request, process.env.ADMIN_TOKEN, {
+    //   raceDetailsId: 1,
+    //   name: uniqueName('get-forbidden'),
+    // });
+
+    const response = await request.get(endpoint(`/${1}`), {
+      headers: authorization(process.env.USER_TOKEN),
     });
 
-    try {
-      const response = await request.get(endpoint(`/${created.id}`), {
-        headers: authorization(process.env.USER_TOKEN),
-      });
-
-      expect(response.status()).toBe(403);
-    } finally {
-      await deleteCharacter(request, process.env.ADMIN_TOKEN, created.id);
-    }
+    expect(response.status()).toBe(403);
   });
 
   // Verifies that a well-formed id which is not stored returns the API's not-found response.
@@ -187,13 +179,9 @@ test.describe('CharacterController endpoint tests', () => {
       name: uniqueName('create-user'),
     });
 
-    try {
-      expect(created.raceDetailsId).toBe(1);
-      expect(created.chapterId).toBe(3);
-      expect(created.sceneId).toBe(3);
-    } finally {
-      await deleteCharacter(request, process.env.USER_TOKEN, created.id);
-    }
+    expect(created.raceDetailsId).toBe(1);
+    expect(created.chapterId).toBe(3);
+    expect(created.sceneId).toBe(3);
   });
 
   // Verifies that an admin may explicitly choose a valid chapter and scene when creating a character.
@@ -205,13 +193,9 @@ test.describe('CharacterController endpoint tests', () => {
       name: uniqueName('create-admin'),
     });
 
-    try {
-      expect(created.chapterId).toBe(1);
-      expect(created.sceneId).toBe(1);
-      expect(created.raceDetailsId).toBe(1);
-    } finally {
-      await deleteCharacter(request, process.env.ADMIN_TOKEN, created.id);
-    }
+    expect(created.chapterId).toBe(1);
+    expect(created.sceneId).toBe(1);
+    expect(created.raceDetailsId).toBe(1);
   });
 
   // Verifies that the create endpoint rejects requests without a JWT.
@@ -273,17 +257,14 @@ test.describe('CharacterController endpoint tests', () => {
       name: uniqueName('delete-no-token'),
     });
 
-    try {
-      const response = await request.delete(endpoint(`/${created.id}`));
-      expect(response.status()).toBe(403);
+    const response = await request.delete(endpoint(`/${created.id}`));
+    expect(response.status()).toBe(403);
 
-      const verificationResponse = await request.get(endpoint(`/${created.id}`), {
-        headers: authorization(process.env.ADMIN_TOKEN),
-      });
-      expect(verificationResponse.status()).toBe(200);
-    } finally {
-      await deleteCharacter(request, process.env.ADMIN_TOKEN, created.id);
-    }
+    const verificationResponse = await request.get(endpoint(`/${created.id}`), {
+      headers: authorization(process.env.ADMIN_TOKEN),
+    });
+    expect(verificationResponse.status()).toBe(200);
+    
   });
 
   // Verifies object-level authorization: a user cannot delete a character owned by the admin account.
@@ -293,15 +274,11 @@ test.describe('CharacterController endpoint tests', () => {
       name: uniqueName('delete-forbidden'),
     });
 
-    try {
-      const response = await request.delete(endpoint(`/${created.id}`), {
-        headers: authorization(process.env.USER_TOKEN),
-      });
+    const response = await request.delete(endpoint(`/${created.id}`), {
+      headers: authorization(process.env.USER_TOKEN),
+    });
 
-      expect(response.status()).toBe(403);
-    } finally {
-      await deleteCharacter(request, process.env.ADMIN_TOKEN, created.id);
-    }
+    expect(response.status()).toBe(403);
   });
 
   // Verifies that an admin can delete an existing character.

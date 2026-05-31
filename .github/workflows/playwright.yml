@@ -30,7 +30,7 @@ jobs:
         working-directory: .
         run: docker compose --profile prod up -d
       - name: Wait for services
-        run: sleep 30
+        run: sleep 60
       - name: Install dependencies
         run: npm ci
       - name: Install Playwright Browsers

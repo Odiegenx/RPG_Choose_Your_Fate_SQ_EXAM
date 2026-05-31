@@ -20,7 +20,7 @@ services:
       MYSQL_URI: jdbc:mysql://rpg_mysql_sq:3306/choose_your_fate
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
-      MYSQL_SECONDARY_URI: jdbc:mysql://rpg_mysql_secondary:3307/choose_your_fate
+      MYSQL_SECONDARY_URI: jdbc:mysql://rpg_mysql_secondary:3306/choose_your_fate
       MYSQL_SECONDARY_USERNAME: root
       MYSQL_SECONDARY_PASSWORD: ${MYSQL_SECONDARY_ROOT_PASSWORD:-123456}
       ELEVEN_LABS_API_KEY: ${ELEVEN_LABS_API_KEY:-}
@@ -51,7 +51,7 @@ services:
     image: mysql:9.5.0
     container_name: rpg_mysql_secondary
     ports:
-      - "3308:3307"
+      - "3308:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_SECONDARY_ROOT_PASSWORD:-123456}
     volumes:

@@ -40,6 +40,7 @@ async function loginAndReturnToken(
     expect(response.status(), body).toBe(200);
 
     const data: { token: string } = JSON.parse(body);
+    expect(data.token).not.toBe(null)
     return data.token;
 }
 
@@ -188,6 +189,7 @@ test.describe("GET /availability/status",()=> {
         // act
         const response = await request.get(process.env.API_URL + rootEndpoint + '/status', { headers: adminHeaders() });
         // Assert
+        expect(response.status()).toBe(200);
         const data = await response.json();
         expect(data.state).toBe('SECONDARY_ACTIVE');
         expect(data.activeRole).toBe('SECONDARY');
