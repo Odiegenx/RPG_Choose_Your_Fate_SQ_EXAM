@@ -42,7 +42,7 @@ public class TTSService {
         }
     }
 
-    public byte[] createAudioBlob(String text) {
+    private byte[] createAudioBlob(String text) {
         ElevenLabsApi elevenLabsApi = ElevenLabsApi.builder()
                 .apiKey(apiKey)
                 .build();
@@ -56,16 +56,15 @@ public class TTSService {
                         .build())
                 .build();
 
-// The call will use the default options configured above.
+        // The call will use the default options configured above.
         TextToSpeechPrompt speechPrompt = new TextToSpeechPrompt(text);
         TextToSpeechResponse response = elevenLabsTextToSpeechModel.call(speechPrompt);
 
         return response.getResult().getOutput();
     }
 
-    public boolean isAudioUpdatedAfterSummary(LocalDateTime summaryDate, LocalDateTime audioBlobDate) {
+    private boolean isAudioUpdatedAfterSummary(LocalDateTime summaryDate, LocalDateTime audioBlobDate) {
         if (summaryDate == null) return true;
         return audioBlobDate.isAfter(summaryDate);
     }
-
 }
