@@ -21,3 +21,12 @@ Windows:
 set K6_USERNAME=admin
 set K6_PASSWORD=admin123
 ```
+
+$env:K6_USERNAME="admin"
+$env:K6_PASSWORD="admin123"
+$env:K6_WEB_DASHBOARD="true"
+$env:K6_WEB_DASHBOARD_EXPORT="results/stress-test-report.html"
+
+$env:Path += ";C:\Program Files\k6"
+
+k6 run tests/stress-tests/character-view-stress-test.js
